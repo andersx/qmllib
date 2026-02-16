@@ -190,8 +190,9 @@ def get_local_kernel(
     if not (N2.shape[0] == X2.shape[0]):
         raise ValueError("List of charges does not match shape of representations")
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
-    Q2_input = np.zeros((max(N2), X2.shape[0]), dtype=np.int32)
+    # CRITICAL: Q_input arrays must match X's padding size (X.shape[1]), not just max(N)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
+    Q2_input = np.zeros((X2.shape[1], X2.shape[0]), dtype=np.int32)
 
     for i, q in enumerate(Q1):
         Q1_input[: len(q), i] = q
@@ -199,7 +200,17 @@ def get_local_kernel(
     for i, q in enumerate(Q2):
         Q2_input[: len(q), i] = q
 
-    K = flocal_kernel(X1, X2, Q1_input, Q2_input, N1, N2, len(N1), len(N2), SIGMA)
+    # Convert to Fortran order for compatibility with Fortran routine
+    X1_f = np.asfortranarray(X1)
+    X2_f = np.asfortranarray(X2)
+    Q1_input_f = np.asfortranarray(Q1_input)
+    Q2_input_f = np.asfortranarray(Q2_input)
+    N1_f = np.asfortranarray(N1)
+    N2_f = np.asfortranarray(N2)
+
+    K = flocal_kernel(
+        X1_f, X2_f, Q1_input_f, Q2_input_f, N1_f, N2_f, len(N1), len(N2), SIGMA
+    )
 
     return K
 
@@ -290,11 +301,17 @@ def get_local_symmetric_kernel(
             "Error: List of charges does not match shape of representations"
         )
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
+    # CRITICAL: Q1_input must match X1's padding size (X1.shape[1]), not just max(N1)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
     for i, q in enumerate(Q1):
         Q1_input[: len(q), i] = q
 
-    K = fsymmetric_local_kernel(X1, Q1_input, N1, len(N1), SIGMA)
+    # Convert to Fortran order for compatibility with Fortran routine
+    X1_f = np.asfortranarray(X1)
+    Q1_input_f = np.asfortranarray(Q1_input)
+    N1_f = np.asfortranarray(N1)
+
+    K = fsymmetric_local_kernel(X1_f, Q1_input_f, N1_f, len(N1), SIGMA)
 
     return K
 

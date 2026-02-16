@@ -2,6 +2,7 @@
 #include <pybind11/numpy.h>
 #include <vector>
 #include <cstring>
+#include <iostream>
 
 namespace py = pybind11;
 
@@ -219,22 +220,35 @@ py::array_t<double> symmetric_local_kernels_wrapper(
 
 // Wrapper for flocal_kernel
 py::array_t<double> local_kernel_wrapper(
-    py::array_t<double, py::array::f_style | py::array::forcecast> x1,
-    py::array_t<double, py::array::f_style | py::array::forcecast> x2,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q2,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n2,
+    py::array_t<double> x1_in,
+    py::array_t<double> x2_in,
+    py::array_t<int> q1_in,
+    py::array_t<int> q2_in,
+    py::array_t<int> n1_in,
+    py::array_t<int> n2_in,
     int nm1,
     int nm2,
     double sigma
 ) {
+    // Explicitly convert to F-contiguous if needed and keep alive
+    auto x1 = py::array_t<double, py::array::f_style | py::array::forcecast>(x1_in);
+    auto x2 = py::array_t<double, py::array::f_style | py::array::forcecast>(x2_in);
+    auto q1 = py::array_t<int, py::array::f_style | py::array::forcecast>(q1_in);
+    auto q2 = py::array_t<int, py::array::f_style | py::array::forcecast>(q2_in);
+    auto n1 = py::array_t<int, py::array::f_style | py::array::forcecast>(n1_in);
+    auto n2 = py::array_t<int, py::array::f_style | py::array::forcecast>(n2_in);
+    
     auto bufX1 = x1.request();
     auto bufX2 = x2.request();
+    auto bufQ1 = q1.request();
+    auto bufQ2 = q2.request();
+    auto bufN1 = n1.request();
+    auto bufN2 = n2.request();
     
+    // Extract dimensions from X arrays (they're already padded correctly)
     int max_atoms1 = static_cast<int>(bufX1.shape[1]);
-    int rep_size = static_cast<int>(bufX1.shape[2]);
     int max_atoms2 = static_cast<int>(bufX2.shape[1]);
+    int rep_size = static_cast<int>(bufX1.shape[2]);
     
     // Create output array (nm2, nm1) - Fortran column-major
     std::vector<ssize_t> shape = {nm2, nm1};
@@ -245,10 +259,10 @@ py::array_t<double> local_kernel_wrapper(
     flocal_kernel(
         static_cast<const double*>(bufX1.ptr),
         static_cast<const double*>(bufX2.ptr),
-        static_cast<const int*>(q1.request().ptr),
-        static_cast<const int*>(q2.request().ptr),
-        static_cast<const int*>(n1.request().ptr),
-        static_cast<const int*>(n2.request().ptr),
+        static_cast<const int*>(bufQ1.ptr),
+        static_cast<const int*>(bufQ2.ptr),
+        static_cast<const int*>(bufN1.ptr),
+        static_cast<const int*>(bufN2.ptr),
         nm1, nm2, sigma,
         static_cast<double*>(bufK.ptr),
         max_atoms1, max_atoms2, rep_size
@@ -259,14 +273,22 @@ py::array_t<double> local_kernel_wrapper(
 
 // Wrapper for fsymmetric_local_kernel
 py::array_t<double> symmetric_local_kernel_wrapper(
-    py::array_t<double, py::array::f_style | py::array::forcecast> x1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n1,
+    py::array_t<double> x1_in,
+    py::array_t<int> q1_in,
+    py::array_t<int> n1_in,
     int nm1,
     double sigma
 ) {
-    auto bufX1 = x1.request();
+    // Explicitly convert to F-contiguous if needed and keep alive
+    auto x1 = py::array_t<double, py::array::f_style | py::array::forcecast>(x1_in);
+    auto q1 = py::array_t<int, py::array::f_style | py::array::forcecast>(q1_in);
+    auto n1 = py::array_t<int, py::array::f_style | py::array::forcecast>(n1_in);
     
+    auto bufX1 = x1.request();
+    auto bufQ1 = q1.request();
+    auto bufN1 = n1.request();
+    
+    // Extract dimensions from X1
     int max_atoms1 = static_cast<int>(bufX1.shape[1]);
     int rep_size = static_cast<int>(bufX1.shape[2]);
     
@@ -278,8 +300,8 @@ py::array_t<double> symmetric_local_kernel_wrapper(
     
     fsymmetric_local_kernel(
         static_cast<const double*>(bufX1.ptr),
-        static_cast<const int*>(q1.request().ptr),
-        static_cast<const int*>(n1.request().ptr),
+        static_cast<const int*>(bufQ1.ptr),
+        static_cast<const int*>(bufN1.ptr),
         nm1, sigma,
         static_cast<double*>(bufK.ptr),
         max_atoms1, rep_size
