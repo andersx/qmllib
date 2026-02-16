@@ -342,6 +342,9 @@ subroutine fget_sbot_local(coordinates, nuclear_charges, ia_python, z1, z2, z3, 
       end if
    end do
 
+   ! Initialize output array BEFORE any early returns
+   ys = 0.0d0
+
    stop_flag = .true.
    do ia2 = 1, nias2
       if (ias2(ia2) == ia) stop_flag = .false.
@@ -357,8 +360,6 @@ subroutine fget_sbot_local(coordinates, nuclear_charges, ia_python, z1, z2, z3, 
    prefactor = 1.0d0/3.0d0
 
    c0 = prefactor*(mod(z1, 1000)*mod(z2, 1000)*mod(z3, 1000))*coeff*dgrid
-
-   ys = 0.0d0
    inv_sigma = -1.0d0/(2*sigma**2)
 
    !$OMP PARALLEL DO
