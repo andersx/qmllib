@@ -8,17 +8,20 @@ from .fkernels import (
     fgaussian_kernel_symmetric,
     fget_local_kernels_gaussian,
     fget_local_kernels_laplacian,
-    fkpca,
     flaplacian_kernel,
     flaplacian_kernel_symmetric,
     flinear_kernel,
     fmatern_kernel_l2,
     fsargan_kernel,
-    fwasserstein_kernel,
 )
 
+# Import from pybind11 modules
+from qmllib._fkernels import fkpca, fwasserstein_kernel
 
-def wasserstein_kernel(A: ndarray, B: ndarray, sigma: float, p: int = 1, q: int = 1) -> ndarray:
+
+def wasserstein_kernel(
+    A: ndarray, B: ndarray, sigma: float, p: int = 1, q: int = 1
+) -> ndarray:
     """Calculates the Wasserstein kernel matrix K, where :math:`K_{ij}`:
 
     :math:`K_{ij} = \\exp \\big( -\\frac{(W_p(A_i, B_i))^q}{\\sigma} \\big)`
@@ -265,7 +268,6 @@ def matern_kernel(
     """
 
     if metric == "l1":
-
         if order == 0:
             gammas = []
 
