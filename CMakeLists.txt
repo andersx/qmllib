@@ -21,10 +21,11 @@ set_property(TARGET qmllib_representations PROPERTY POSITION_INDEPENDENT_CODE ON
 add_library(qmllib_utils OBJECT src/qmllib/utils/fsettings.f90)
 set_property(TARGET qmllib_utils PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-# Fortran kernels (kpca and wasserstein) as an object library
+# Fortran kernels as an object library
 add_library(qmllib_fkernels OBJECT 
     src/qmllib/kernels/fkpca.f90
     src/qmllib/kernels/fkwasserstein.f90
+    src/qmllib/kernels/fkernels.f90
 )
 set_property(TARGET qmllib_fkernels PROPERTY POSITION_INDEPENDENT_CODE ON)
 
