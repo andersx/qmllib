@@ -22,6 +22,24 @@ extern "C" {
         int order, const double* pd, double distance_scale, double angular_scale,
         int alchemy, double two_body_power, double three_body_power,
         int kernel_idx, const double* parameters, double* kernels);
+    
+    void fget_global_symmetric_kernels_fchl(
+        int nm1, int na1, int nf1, int nn1, int np1, int npd1, int npd2, int npar1, int npar2,
+        const double* x1, int verbose, const int* n1, const int* nneigh1, int nsigmas,
+        double t_width, double d_width, double cut_start, double cut_distance,
+        int order, const double* pd, double distance_scale, double angular_scale,
+        int alchemy, double two_body_power, double three_body_power,
+        int kernel_idx, const double* parameters, double* kernels);
+    
+    void fget_global_kernels_fchl(
+        int nm1, int nm2, int na1, int nf1, int nn1, int na2, int nf2, int nn2,
+        int np1, int np2, int npd1, int npd2, int npar1, int npar2,
+        const double* x1, const double* x2, int verbose, const int* n1, const int* n2,
+        const int* nneigh1, const int* nneigh2, int nsigmas,
+        double t_width, double d_width, double cut_start, double cut_distance,
+        int order, const double* pd, double distance_scale, double angular_scale,
+        int alchemy, double two_body_power, double three_body_power,
+        int kernel_idx, const double* parameters, double* kernels);
 }
 
 py::array_t<double> fget_kernels_fchl_py(
