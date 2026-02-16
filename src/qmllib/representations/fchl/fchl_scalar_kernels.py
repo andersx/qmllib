@@ -13,17 +13,11 @@ from .ffchl_module import (
     # fget_global_kernels_fchl,
     # fget_global_symmetric_kernels_fchl,
     fget_kernels_fchl,
-    # fget_symmetric_kernels_fchl,
+    fget_symmetric_kernels_fchl,
 )
 
 
 # Temporary stubs for functions not yet migrated
-def fget_symmetric_kernels_fchl(*args, **kwargs):
-    raise NotImplementedError(
-        "fget_symmetric_kernels_fchl not yet migrated to pybind11"
-    )
-
-
 def fget_global_symmetric_kernels_fchl(*args, **kwargs):
     raise NotImplementedError(
         "fget_global_symmetric_kernels_fchl not yet migrated to pybind11"

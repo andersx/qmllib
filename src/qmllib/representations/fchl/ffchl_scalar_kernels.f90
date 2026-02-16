@@ -215,51 +215,59 @@ subroutine fget_kernels_fchl(nm1, nm2, na1, nf1, nn1, na2, nf2, nn2, &
 
 end subroutine fget_kernels_fchl
 
-subroutine fget_symmetric_kernels_fchl(x1, verbose, n1, nneigh1, nm1, nsigmas, &
+subroutine fget_symmetric_kernels_fchl(nm1, na1, nf1, nn1, np1, npd1, npd2, npar1, npar2, &
+       & x1, verbose, n1, nneigh1, nsigmas, &
        & t_width, d_width, cut_start, cut_distance, order, pd, &
        & distance_scale, angular_scale, alchemy, two_body_power, three_body_power, &
-       & kernel_idx, parameters, kernels)
+       & kernel_idx, parameters, kernels) bind(C, name="fget_symmetric_kernels_fchl")
 
+   use iso_c_binding
    use ffchl_module, only: scalar, get_angular_norm2, get_pmax, get_ksi, init_cosp_sinp, get_selfscalar
-
    use ffchl_kernels, only: kernel
 
    implicit none
 
-   ! FCHL descriptors for the training set, format (i,j_1,5,m_1)
-   double precision, dimension(:, :, :, :), intent(in) :: x1
+   ! Dimensions (must come first for bind(C))
+   integer(c_int), intent(in), value :: nm1           ! Number of molecules
+   integer(c_int), intent(in), value :: na1, nf1, nn1 ! x1 dimensions: natoms, nfeatures, nneighbors
+   integer(c_int), intent(in), value :: np1           ! n1 dimension
+   integer(c_int), intent(in), value :: npd1, npd2    ! pd dimensions
+   integer(c_int), intent(in), value :: npar1, npar2  ! parameters dimensions
+   integer(c_int), intent(in), value :: nsigmas       ! Number of sigmas
+   integer(c_int), intent(in), value :: order         ! Truncation order for Fourier terms
+   integer(c_int), intent(in), value :: kernel_idx    ! Kernel ID
 
-   ! Whether to be verbose with output
-   logical, intent(in) :: verbose
+   ! FCHL descriptors for the training set, format (i,j_1,5,m_1)
+   real(c_double), dimension(nm1, na1, nf1, nn1), intent(in) :: x1
+
+   ! Whether to be verbose with output (int instead of logical for C compat)
+   integer(c_int), intent(in), value :: verbose
 
    ! List of numbers of atoms in each molecule
-   integer, dimension(:), intent(in) :: n1
+   integer(c_int), dimension(np1), intent(in) :: n1
 
    ! Number of neighbors for each atom in each compound
-   integer, dimension(:, :), intent(in) :: nneigh1
+   integer(c_int), dimension(nm1, na1), intent(in) :: nneigh1
 
-   ! Number of molecules
-   integer, intent(in) :: nm1
+   real(c_double), intent(in), value :: two_body_power
+   real(c_double), intent(in), value :: three_body_power
 
-   ! Number of sigmas
-   integer, intent(in) :: nsigmas
+   real(c_double), intent(in), value :: t_width
+   real(c_double), intent(in), value :: d_width
+   real(c_double), intent(in), value :: cut_start
+   real(c_double), intent(in), value :: cut_distance
+   real(c_double), intent(in), value :: distance_scale
+   real(c_double), intent(in), value :: angular_scale
 
-   double precision, intent(in) :: two_body_power
-   double precision, intent(in) :: three_body_power
-
-   double precision, intent(in) :: t_width
-   double precision, intent(in) :: d_width
-   double precision, intent(in) :: cut_start
-   double precision, intent(in) :: cut_distance
-   integer, intent(in) :: order
-   double precision, intent(in) :: distance_scale
-   double precision, intent(in) :: angular_scale
-
-   logical, intent(in) :: alchemy
-   double precision, dimension(:, :), intent(in) :: pd
+   ! Switch alchemy on or off (int instead of logical for C compat)
+   integer(c_int), intent(in), value :: alchemy
+   real(c_double), dimension(npd1, npd2), intent(in) :: pd
 
    ! Resulting alpha vector
-   double precision, dimension(nsigmas, nm1, nm1), intent(out) :: kernels
+   real(c_double), dimension(nsigmas, nm1, nm1), intent(out) :: kernels
+
+   ! Kernel parameters
+   real(c_double), dimension(npar1, npar2), intent(in) :: parameters
 
    ! Internal counters
    integer :: i, j, ni, nj
@@ -277,12 +285,8 @@ subroutine fget_symmetric_kernels_fchl(x1, verbose, n1, nneigh1, nm1, nsigmas, &
    double precision, allocatable, dimension(:, :, :, :, :) :: sinp1
    double precision, allocatable, dimension(:, :, :, :, :) :: cosp1
 
-   integer, intent(in) :: kernel_idx
-   double precision, dimension(:, :), intent(in) :: parameters
-
    ! counter for periodic distance
    integer :: pmax1
-   ! integer :: nneighi
 
    double precision :: ang_norm2
 
@@ -290,6 +294,12 @@ subroutine fget_symmetric_kernels_fchl(x1, verbose, n1, nneigh1, nm1, nsigmas, &
 
    ! Work kernel
    double precision, allocatable, dimension(:) :: ktmp
+
+   ! Convert C int to Fortran logical
+   logical :: verbose_logical, alchemy_logical
+
+   verbose_logical = (verbose /= 0)
+   alchemy_logical = (alchemy /= 0)
 
    kernels(:, :, :) = 0.0d0
 
@@ -299,18 +309,18 @@ subroutine fget_symmetric_kernels_fchl(x1, verbose, n1, nneigh1, nm1, nsigmas, &
    pmax1 = get_pmax(x1, n1)
 
    allocate (ksi1(size(x1, dim=1), maxval(n1), maxval(nneigh1)))
-   call get_ksi(x1, n1, nneigh1, two_body_power, cut_start, cut_distance, verbose, ksi1)
+   call get_ksi(x1, n1, nneigh1, two_body_power, cut_start, cut_distance, verbose_logical, ksi1)
    !ksi1 = get_ksi(x1, n1, nneigh1, two_body_power, cut_start, cut_distance, verbose)
 
    allocate (cosp1(nm1, maxval(n1), pmax1, order, maxval(nneigh1)))
    allocate (sinp1(nm1, maxval(n1), pmax1, order, maxval(nneigh1)))
 
    call init_cosp_sinp(x1, n1, nneigh1, three_body_power, order, cut_start, cut_distance, &
-       & cosp1, sinp1, verbose)
+       & cosp1, sinp1, verbose_logical)
 
    allocate (self_scalar1(nm1, maxval(n1)))
    call get_selfscalar(x1, nm1, n1, nneigh1, ksi1, sinp1, cosp1, t_width, d_width, &
-        & cut_distance, order, pd, ang_norm2, distance_scale, angular_scale, alchemy, verbose, self_scalar1)
+        & cut_distance, order, pd, ang_norm2, distance_scale, angular_scale, alchemy_logical, verbose_logical, self_scalar1)
    !self_scalar1 = get_selfscalar(x1, nm1, n1, nneigh1, ksi1, sinp1, cosp1, t_width, d_width, &
    !     & cut_distance, order, pd, ang_norm2, distance_scale, angular_scale, alchemy, verbose)
 
@@ -330,7 +340,7 @@ subroutine fget_symmetric_kernels_fchl(x1, verbose, n1, nneigh1, nm1, nsigmas, &
                    & sinp1(a, i, :, :, :), sinp1(b, j, :, :, :), &
                    & cosp1(a, i, :, :, :), cosp1(b, j, :, :, :), &
                    & t_width, d_width, cut_distance, order, &
-                   & pd, ang_norm2, distance_scale, angular_scale, alchemy)
+                   & pd, ang_norm2, distance_scale, angular_scale, alchemy_logical)
 
                ktmp(:) = 0.0d0
                call kernel(self_scalar1(a, i), self_scalar1(b, j), s12, &
