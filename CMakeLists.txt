@@ -50,11 +50,7 @@ add_library(qmllib_ffchl OBJECT
     src/qmllib/representations/fchl/ffchl_kernel_types.f90
     src/qmllib/representations/fchl/ffchl_kernels.f90
     src/qmllib/representations/fchl/ffchl_module.f90
-    src/qmllib/representations/fchl/ffchl_module_ef.f90
     src/qmllib/representations/fchl/ffchl_scalar_kernels.f90
-    src/qmllib/representations/fchl/ffchl_force_kernels.f90
-    src/qmllib/representations/fchl/ffchl_kernels_ef.f90
-    src/qmllib/representations/fchl/ffchl_wrappers.f90
 )
 set_property(TARGET qmllib_ffchl PROPERTY POSITION_INDEPENDENT_CODE ON)
 
@@ -124,7 +120,7 @@ set_target_properties(_fslatm PROPERTIES OUTPUT_NAME "_fslatm")
 
 # Build the Python extension module for FCHL representations
 pybind11_add_module(ffchl_module MODULE
-    src/qmllib/representations/fchl/bindings_ffchl.cpp
+    src/qmllib/representations/fchl/bindings_fchl_simple.cpp
     $<TARGET_OBJECTS:qmllib_ffchl>
 )
 
