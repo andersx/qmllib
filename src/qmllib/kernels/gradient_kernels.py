@@ -9,7 +9,8 @@ from qmllib.utils.environment_manipulation import (
     mkl_set_num_threads,
 )
 
-from .fgradient_kernels import (
+# Import from pybind11 module
+from qmllib._fgradient_kernels import (
     fatomic_local_gradient_kernel,
     fatomic_local_kernel,
     fgaussian_process_kernel,
@@ -62,7 +63,9 @@ def get_global_kernel(
     if not (N1.shape[0] == X1.shape[0]):
         raise ValueError("List of charges does not match shape of representations")
     if not (N2.shape[0] == X2.shape[0]):
-        raise ValueError("Error: List of charges does not match shape of representations")
+        raise ValueError(
+            "Error: List of charges does not match shape of representations"
+        )
 
     Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
     Q2_input = np.zeros((max(N2), X2.shape[0]), dtype=np.int32)
@@ -79,7 +82,11 @@ def get_global_kernel(
 
 
 def get_local_kernels(
-    X1: ndarray, X2: ndarray, Q1: List[List[int]], Q2: List[List[int]], SIGMAS: List[float]
+    X1: ndarray,
+    X2: ndarray,
+    Q1: List[List[int]],
+    Q2: List[List[int]],
+    SIGMAS: List[float],
 ) -> ndarray:
     """Calculates the Gaussian kernel matrix K with the local decomposition where :math:`K_{ij}`:
 
@@ -113,9 +120,13 @@ def get_local_kernels(
     N2 = np.array([len(Q) for Q in Q2], dtype=np.int32)
 
     if not (N1.shape[0] == X1.shape[0]):
-        raise ValueError("Error: List of charges does not match shape of representations")
+        raise ValueError(
+            "Error: List of charges does not match shape of representations"
+        )
     if not (N2.shape[0] == X2.shape[0]):
-        raise ValueError("Error: List of charges does not match shape of representations")
+        raise ValueError(
+            "Error: List of charges does not match shape of representations"
+        )
 
     Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
     Q2_input = np.zeros((max(N2), X2.shape[0]), dtype=np.int32)
@@ -129,7 +140,9 @@ def get_local_kernels(
     for i, q in enumerate(Q2):
         Q2_input[: len(q), i] = q
 
-    K = flocal_kernels(X1, X2, Q1_input, Q2_input, N1, N2, len(N1), len(N2), sigmas_input, nsigmas)
+    K = flocal_kernels(
+        X1, X2, Q1_input, Q2_input, N1, N2, len(N1), len(N2), sigmas_input, nsigmas
+    )
 
     return K
 
@@ -191,7 +204,9 @@ def get_local_kernel(
     return K
 
 
-def get_local_symmetric_kernels(X1: ndarray, Q1: List[List[int]], SIGMAS: List[float]) -> ndarray:
+def get_local_symmetric_kernels(
+    X1: ndarray, Q1: List[List[int]], SIGMAS: List[float]
+) -> ndarray:
     """Calculates the Gaussian kernel matrix K with the local decomposition where :math:`K_{ij}`:
 
         :math:`K_{ij} = \\sum_{I\\in i} \\sum_{J\\in j}\\exp \\big( -\\frac{\\|X_I - X_J\\|_2^2}{2\\sigma^2} \\big)`
@@ -223,7 +238,9 @@ def get_local_symmetric_kernels(X1: ndarray, Q1: List[List[int]], SIGMAS: List[f
     N1 = np.array([len(Q) for Q in Q1], dtype=np.int32)
 
     if not (N1.shape[0] == X1.shape[0]):
-        raise ValueError("Error: List of charges does not match shape of representations")
+        raise ValueError(
+            "Error: List of charges does not match shape of representations"
+        )
 
     Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
     for i, q in enumerate(Q1):
@@ -269,7 +286,9 @@ def get_local_symmetric_kernel(
     N1 = np.array([len(Q) for Q in Q1], dtype=np.int32)
 
     if not (N1.shape[0] == X1.shape[0]):
-        raise ValueError("Error: List of charges does not match shape of representations")
+        raise ValueError(
+            "Error: List of charges does not match shape of representations"
+        )
 
     Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
     for i, q in enumerate(Q1):
@@ -427,7 +446,12 @@ def get_atomic_local_gradient_kernel(
 
 
 def get_local_gradient_kernel(
-    X1: ndarray, X2: ndarray, dX2: ndarray, Q1: List[List[int]], Q2: List[List[int]], SIGMA: float
+    X1: ndarray,
+    X2: ndarray,
+    dX2: ndarray,
+    Q1: List[List[int]],
+    Q2: List[List[int]],
+    SIGMA: float,
 ) -> ndarray:
     """Calculates the Gaussian kernel matrix K with the local decomposition where :math:`K_{ij}`:
 
@@ -758,7 +782,9 @@ def get_symmetric_gp_kernel(
     original_mkl_threads = mkl_get_num_threads()
     mkl_set_num_threads(1)
 
-    K = fsymmetric_gaussian_process_kernel(X1, dX1, Q1_input, N1, len(N1), np.sum(N1), SIGMA)
+    K = fsymmetric_gaussian_process_kernel(
+        X1, dX1, Q1_input, N1, len(N1), np.sum(N1), SIGMA
+    )
 
     # Reset MKL_NUM_THREADS back to its original value
     mkl_set_num_threads(original_mkl_threads)
