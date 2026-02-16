@@ -686,6 +686,7 @@ subroutine fgenerate_fchl_acsf(coordinates, nuclear_charges, elements, &
     ! Allocate temporary
     allocate(radial(nbasis2))
 
+    rep = 0.0d0
     radial = 0.0d0
     ! !$OMP PARALLEL DO PRIVATE(n,m,rij,radial) REDUCTION(+:rep)
     do i = 1, natoms
