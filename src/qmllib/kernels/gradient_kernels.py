@@ -67,8 +67,8 @@ def get_global_kernel(
             "Error: List of charges does not match shape of representations"
         )
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
-    Q2_input = np.zeros((max(N2), X2.shape[0]), dtype=np.int32)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
+    Q2_input = np.zeros((X2.shape[1], X2.shape[0]), dtype=np.int32)
 
     for i, q in enumerate(Q1):
         Q1_input[: len(q), i] = q
@@ -128,8 +128,8 @@ def get_local_kernels(
             "Error: List of charges does not match shape of representations"
         )
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
-    Q2_input = np.zeros((max(N2), X2.shape[0]), dtype=np.int32)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
+    Q2_input = np.zeros((X2.shape[1], X2.shape[0]), dtype=np.int32)
 
     sigmas_input = np.array(SIGMAS, dtype=np.float64)
     nsigmas = len(SIGMAS)
@@ -253,7 +253,7 @@ def get_local_symmetric_kernels(
             "Error: List of charges does not match shape of representations"
         )
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
     for i, q in enumerate(Q1):
         Q1_input[: len(q), i] = q
 
@@ -362,8 +362,8 @@ def get_atomic_local_kernel(
     if not (N2.shape[0] == X2.shape[0]):
         raise ValueError("List of charges does not match shape of representations")
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
-    Q2_input = np.zeros((max(N2), X2.shape[0]), dtype=np.int32)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
+    Q2_input = np.zeros((X2.shape[1], X2.shape[0]), dtype=np.int32)
 
     for i, q in enumerate(Q1):
         Q1_input[: len(q), i] = q
@@ -425,8 +425,8 @@ def get_atomic_local_gradient_kernel(
     if not (N2.shape[0] == X2.shape[0]):
         raise ValueError("List of charges does not match shape of representations")
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
-    Q2_input = np.zeros((max(N2), X2.shape[0]), dtype=np.int32)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
+    Q2_input = np.zeros((X2.shape[1], X2.shape[0]), dtype=np.int32)
 
     for i, q in enumerate(Q1):
         Q1_input[: len(q), i] = q
@@ -509,8 +509,8 @@ def get_local_gradient_kernel(
     if not (N2.shape[0] == X2.shape[0]):
         raise ValueError("List of charges does not match shape of representations")
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
-    Q2_input = np.zeros((max(N2), X2.shape[0]), dtype=np.int32)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
+    Q2_input = np.zeros((X2.shape[1], X2.shape[0]), dtype=np.int32)
 
     for i, q in enumerate(Q1):
         Q1_input[: len(q), i] = q
@@ -584,8 +584,8 @@ def get_gdml_kernel(
     if not (N2.shape[0] == X2.shape[0]):
         raise ValueError("List of charges does not match shape of representations")
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
-    Q2_input = np.zeros((max(N2), X2.shape[0]), dtype=np.int32)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
+    Q2_input = np.zeros((X2.shape[1], X2.shape[0]), dtype=np.int32)
 
     for i, q in enumerate(Q1):
         Q1_input[: len(q), i] = q
@@ -655,7 +655,7 @@ def get_symmetric_gdml_kernel(
     if not (N1.shape[0] == X1.shape[0]):
         raise ValueError("List of charges does not match shape of representations")
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
 
     for i, q in enumerate(Q1):
         Q1_input[: len(q), i] = q
@@ -721,8 +721,8 @@ def get_gp_kernel(
     if not (N2.shape[0] == X2.shape[0]):
         raise ValueError("List of charges does not match shape of representations")
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
-    Q2_input = np.zeros((max(N2), X2.shape[0]), dtype=np.int32)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
+    Q2_input = np.zeros((X2.shape[1], X2.shape[0]), dtype=np.int32)
 
     for i, q in enumerate(Q1):
         Q1_input[: len(q), i] = q
@@ -790,7 +790,7 @@ def get_symmetric_gp_kernel(
     if not (N1.shape[0] == X1.shape[0]):
         raise ValueError("List of charges does not match shape of representations")
 
-    Q1_input = np.zeros((max(N1), X1.shape[0]), dtype=np.int32)
+    Q1_input = np.zeros((X1.shape[1], X1.shape[0]), dtype=np.int32)
 
     for i, q in enumerate(Q1):
         Q1_input[: len(q), i] = q

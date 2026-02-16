@@ -312,37 +312,50 @@ py::array_t<double> symmetric_local_kernel_wrapper(
 
 // Wrapper for fatomic_local_kernel
 py::array_t<double> atomic_local_kernel_wrapper(
-    py::array_t<double, py::array::f_style | py::array::forcecast> x1,
-    py::array_t<double, py::array::f_style | py::array::forcecast> x2,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q2,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n2,
+    py::array_t<double, py::array::f_style | py::array::forcecast> x1_in,
+    py::array_t<double, py::array::f_style | py::array::forcecast> x2_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> q1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> q2_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> n1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> n2_in,
     int nm1,
     int nm2,
     int na1,
     double sigma
 ) {
+    // Ensure converted arrays stay alive
+    auto x1 = py::array_t<double, py::array::f_style | py::array::forcecast>(x1_in);
+    auto x2 = py::array_t<double, py::array::f_style | py::array::forcecast>(x2_in);
+    auto q1 = py::array_t<int, py::array::f_style | py::array::forcecast>(q1_in);
+    auto q2 = py::array_t<int, py::array::f_style | py::array::forcecast>(q2_in);
+    auto n1 = py::array_t<int, py::array::f_style | py::array::forcecast>(n1_in);
+    auto n2 = py::array_t<int, py::array::f_style | py::array::forcecast>(n2_in);
+    
     auto bufX1 = x1.request();
     auto bufX2 = x2.request();
+    auto bufQ1 = q1.request();
+    auto bufQ2 = q2.request();
+    auto bufN1 = n1.request();
+    auto bufN2 = n2.request();
     
     int max_atoms1 = static_cast<int>(bufX1.shape[1]);
     int rep_size = static_cast<int>(bufX1.shape[2]);
     int max_atoms2 = static_cast<int>(bufX2.shape[1]);
     
-    // Create output array (na1, nm2, nm1) - Fortran column-major
-    std::vector<ssize_t> shape = {na1, nm2, nm1};
-    std::vector<ssize_t> strides = {sizeof(double), sizeof(double) * na1, sizeof(double) * na1 * nm2};
+    // Create output array (nm2, na1) - Fortran column-major
+    // Note: Fortran expects kernel(nm2, na1)
+    std::vector<ssize_t> shape = {nm2, na1};
+    std::vector<ssize_t> strides = {sizeof(double), sizeof(double) * nm2};
     auto kernel = py::array_t<double>(shape, strides);
     auto bufK = kernel.request();
     
     fatomic_local_kernel(
         static_cast<const double*>(bufX1.ptr),
         static_cast<const double*>(bufX2.ptr),
-        static_cast<const int*>(q1.request().ptr),
-        static_cast<const int*>(q2.request().ptr),
-        static_cast<const int*>(n1.request().ptr),
-        static_cast<const int*>(n2.request().ptr),
+        static_cast<const int*>(bufQ1.ptr),
+        static_cast<const int*>(bufQ2.ptr),
+        static_cast<const int*>(bufN1.ptr),
+        static_cast<const int*>(bufN2.ptr),
         nm1, nm2, na1, sigma,
         static_cast<double*>(bufK.ptr),
         max_atoms1, max_atoms2, rep_size
@@ -353,22 +366,35 @@ py::array_t<double> atomic_local_kernel_wrapper(
 
 // Wrapper for fatomic_local_gradient_kernel
 py::array_t<double> atomic_local_gradient_kernel_wrapper(
-    py::array_t<double, py::array::f_style | py::array::forcecast> x1,
-    py::array_t<double, py::array::f_style | py::array::forcecast> x2,
-    py::array_t<double, py::array::f_style | py::array::forcecast> dx2,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q2,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n2,
+    py::array_t<double, py::array::f_style | py::array::forcecast> x1_in,
+    py::array_t<double, py::array::f_style | py::array::forcecast> x2_in,
+    py::array_t<double, py::array::f_style | py::array::forcecast> dx2_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> q1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> q2_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> n1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> n2_in,
     int nm1,
     int nm2,
     int na1,
     int naq2,
     double sigma
 ) {
+    // Ensure converted arrays stay alive
+    auto x1 = py::array_t<double, py::array::f_style | py::array::forcecast>(x1_in);
+    auto x2 = py::array_t<double, py::array::f_style | py::array::forcecast>(x2_in);
+    auto dx2 = py::array_t<double, py::array::f_style | py::array::forcecast>(dx2_in);
+    auto q1 = py::array_t<int, py::array::f_style | py::array::forcecast>(q1_in);
+    auto q2 = py::array_t<int, py::array::f_style | py::array::forcecast>(q2_in);
+    auto n1 = py::array_t<int, py::array::f_style | py::array::forcecast>(n1_in);
+    auto n2 = py::array_t<int, py::array::f_style | py::array::forcecast>(n2_in);
+    
     auto bufX1 = x1.request();
     auto bufX2 = x2.request();
     auto bufDX2 = dx2.request();
+    auto bufQ1 = q1.request();
+    auto bufQ2 = q2.request();
+    auto bufN1 = n1.request();
+    auto bufN2 = n2.request();
     
     if (bufDX2.ndim != 5) {
         throw std::runtime_error("DX2 must be a 5D array");
@@ -378,9 +404,10 @@ py::array_t<double> atomic_local_gradient_kernel_wrapper(
     int rep_size = static_cast<int>(bufX1.shape[2]);
     int max_atoms2 = static_cast<int>(bufX2.shape[1]);
     
-    // Create output array (na1, naq2) - Fortran column-major
-    std::vector<ssize_t> shape = {na1, naq2};
-    std::vector<ssize_t> strides = {sizeof(double), sizeof(double) * na1};
+    // Create output array (naq2, na1) - Fortran column-major
+    // Note: Fortran expects kernel(naq2, na1)
+    std::vector<ssize_t> shape = {naq2, na1};
+    std::vector<ssize_t> strides = {sizeof(double), sizeof(double) * naq2};
     auto kernel = py::array_t<double>(shape, strides);
     auto bufK = kernel.request();
     
@@ -388,10 +415,10 @@ py::array_t<double> atomic_local_gradient_kernel_wrapper(
         static_cast<const double*>(bufX1.ptr),
         static_cast<const double*>(bufX2.ptr),
         static_cast<const double*>(bufDX2.ptr),
-        static_cast<const int*>(q1.request().ptr),
-        static_cast<const int*>(q2.request().ptr),
-        static_cast<const int*>(n1.request().ptr),
-        static_cast<const int*>(n2.request().ptr),
+        static_cast<const int*>(bufQ1.ptr),
+        static_cast<const int*>(bufQ2.ptr),
+        static_cast<const int*>(bufN1.ptr),
+        static_cast<const int*>(bufN2.ptr),
         nm1, nm2, na1, naq2, sigma,
         static_cast<double*>(bufK.ptr),
         max_atoms1, max_atoms2, rep_size
@@ -450,42 +477,61 @@ py::array_t<double> local_gradient_kernel_wrapper(
 
 // Wrapper for fgdml_kernel
 py::array_t<double> gdml_kernel_wrapper(
-    py::array_t<double, py::array::f_style | py::array::forcecast> x1,
-    py::array_t<double, py::array::f_style | py::array::forcecast> x2,
-    py::array_t<double, py::array::f_style | py::array::forcecast> dx1,
-    py::array_t<double, py::array::f_style | py::array::forcecast> dx2,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q2,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n2,
+    py::array_t<double, py::array::f_style | py::array::forcecast> x1_in,
+    py::array_t<double, py::array::f_style | py::array::forcecast> x2_in,
+    py::array_t<double, py::array::f_style | py::array::forcecast> dx1_in,
+    py::array_t<double, py::array::f_style | py::array::forcecast> dx2_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> q1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> q2_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> n1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> n2_in,
     int nm1,
     int nm2,
     int na1,
     int na2,
     double sigma
 ) {
+    // Ensure converted arrays stay alive
+    auto x1 = py::array_t<double, py::array::f_style | py::array::forcecast>(x1_in);
+    auto x2 = py::array_t<double, py::array::f_style | py::array::forcecast>(x2_in);
+    auto dx1 = py::array_t<double, py::array::f_style | py::array::forcecast>(dx1_in);
+    auto dx2 = py::array_t<double, py::array::f_style | py::array::forcecast>(dx2_in);
+    auto q1 = py::array_t<int, py::array::f_style | py::array::forcecast>(q1_in);
+    auto q2 = py::array_t<int, py::array::f_style | py::array::forcecast>(q2_in);
+    auto n1 = py::array_t<int, py::array::f_style | py::array::forcecast>(n1_in);
+    auto n2 = py::array_t<int, py::array::f_style | py::array::forcecast>(n2_in);
+    
     auto bufX1 = x1.request();
     auto bufX2 = x2.request();
+    auto bufDX1 = dx1.request();
+    auto bufDX2 = dx2.request();
+    auto bufQ1 = q1.request();
+    auto bufQ2 = q2.request();
+    auto bufN1 = n1.request();
+    auto bufN2 = n2.request();
     
     int max_atoms1 = static_cast<int>(bufX1.shape[1]);
     int rep_size = static_cast<int>(bufX1.shape[2]);
     int max_atoms2 = static_cast<int>(bufX2.shape[1]);
     
-    // Create output array (na2, na1) - Fortran column-major
-    std::vector<ssize_t> shape = {na2, na1};
-    std::vector<ssize_t> strides = {sizeof(double), sizeof(double) * na2};
+    // Create output array (na2*3, na1*3) - Fortran column-major
+    // Note: Fortran expects kernel(na2*3, na1*3)
+    int rows = na2 * 3;
+    int cols = na1 * 3;
+    std::vector<ssize_t> shape = {rows, cols};
+    std::vector<ssize_t> strides = {sizeof(double), sizeof(double) * rows};
     auto kernel = py::array_t<double>(shape, strides);
     auto bufK = kernel.request();
     
     fgdml_kernel(
         static_cast<const double*>(bufX1.ptr),
         static_cast<const double*>(bufX2.ptr),
-        static_cast<const double*>(dx1.request().ptr),
-        static_cast<const double*>(dx2.request().ptr),
-        static_cast<const int*>(q1.request().ptr),
-        static_cast<const int*>(q2.request().ptr),
-        static_cast<const int*>(n1.request().ptr),
-        static_cast<const int*>(n2.request().ptr),
+        static_cast<const double*>(bufDX1.ptr),
+        static_cast<const double*>(bufDX2.ptr),
+        static_cast<const int*>(bufQ1.ptr),
+        static_cast<const int*>(bufQ2.ptr),
+        static_cast<const int*>(bufN1.ptr),
+        static_cast<const int*>(bufN2.ptr),
         nm1, nm2, na1, na2, sigma,
         static_cast<double*>(bufK.ptr),
         max_atoms1, max_atoms2, rep_size
@@ -496,30 +542,41 @@ py::array_t<double> gdml_kernel_wrapper(
 
 // Wrapper for fsymmetric_gdml_kernel
 py::array_t<double> symmetric_gdml_kernel_wrapper(
-    py::array_t<double, py::array::f_style | py::array::forcecast> x1,
-    py::array_t<double, py::array::f_style | py::array::forcecast> dx1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n1,
+    py::array_t<double, py::array::f_style | py::array::forcecast> x1_in,
+    py::array_t<double, py::array::f_style | py::array::forcecast> dx1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> q1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> n1_in,
     int nm1,
     int na1,
     double sigma
 ) {
+    // Ensure converted arrays stay alive
+    auto x1 = py::array_t<double, py::array::f_style | py::array::forcecast>(x1_in);
+    auto dx1 = py::array_t<double, py::array::f_style | py::array::forcecast>(dx1_in);
+    auto q1 = py::array_t<int, py::array::f_style | py::array::forcecast>(q1_in);
+    auto n1 = py::array_t<int, py::array::f_style | py::array::forcecast>(n1_in);
+    
     auto bufX1 = x1.request();
+    auto bufDX1 = dx1.request();
+    auto bufQ1 = q1.request();
+    auto bufN1 = n1.request();
     
     int max_atoms1 = static_cast<int>(bufX1.shape[1]);
     int rep_size = static_cast<int>(bufX1.shape[2]);
     
-    // Create output array (na1, na1) - Fortran column-major
-    std::vector<ssize_t> shape = {na1, na1};
-    std::vector<ssize_t> strides = {sizeof(double), sizeof(double) * na1};
+    // Create output array (na1*3, na1*3) - Fortran column-major
+    // Note: Fortran expects kernel(na1*3, na1*3)
+    int size = na1 * 3;
+    std::vector<ssize_t> shape = {size, size};
+    std::vector<ssize_t> strides = {sizeof(double), sizeof(double) * size};
     auto kernel = py::array_t<double>(shape, strides);
     auto bufK = kernel.request();
     
     fsymmetric_gdml_kernel(
         static_cast<const double*>(bufX1.ptr),
-        static_cast<const double*>(dx1.request().ptr),
-        static_cast<const int*>(q1.request().ptr),
-        static_cast<const int*>(n1.request().ptr),
+        static_cast<const double*>(bufDX1.ptr),
+        static_cast<const int*>(bufQ1.ptr),
+        static_cast<const int*>(bufN1.ptr),
         nm1, na1, sigma,
         static_cast<double*>(bufK.ptr),
         max_atoms1, rep_size
@@ -530,42 +587,61 @@ py::array_t<double> symmetric_gdml_kernel_wrapper(
 
 // Wrapper for fgaussian_process_kernel
 py::array_t<double> gaussian_process_kernel_wrapper(
-    py::array_t<double, py::array::f_style | py::array::forcecast> x1,
-    py::array_t<double, py::array::f_style | py::array::forcecast> x2,
-    py::array_t<double, py::array::f_style | py::array::forcecast> dx1,
-    py::array_t<double, py::array::f_style | py::array::forcecast> dx2,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q2,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n2,
+    py::array_t<double, py::array::f_style | py::array::forcecast> x1_in,
+    py::array_t<double, py::array::f_style | py::array::forcecast> x2_in,
+    py::array_t<double, py::array::f_style | py::array::forcecast> dx1_in,
+    py::array_t<double, py::array::f_style | py::array::forcecast> dx2_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> q1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> q2_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> n1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> n2_in,
     int nm1,
     int nm2,
     int na1,
     int na2,
     double sigma
 ) {
+    // Ensure converted arrays stay alive
+    auto x1 = py::array_t<double, py::array::f_style | py::array::forcecast>(x1_in);
+    auto x2 = py::array_t<double, py::array::f_style | py::array::forcecast>(x2_in);
+    auto dx1 = py::array_t<double, py::array::f_style | py::array::forcecast>(dx1_in);
+    auto dx2 = py::array_t<double, py::array::f_style | py::array::forcecast>(dx2_in);
+    auto q1 = py::array_t<int, py::array::f_style | py::array::forcecast>(q1_in);
+    auto q2 = py::array_t<int, py::array::f_style | py::array::forcecast>(q2_in);
+    auto n1 = py::array_t<int, py::array::f_style | py::array::forcecast>(n1_in);
+    auto n2 = py::array_t<int, py::array::f_style | py::array::forcecast>(n2_in);
+    
     auto bufX1 = x1.request();
     auto bufX2 = x2.request();
+    auto bufDX1 = dx1.request();
+    auto bufDX2 = dx2.request();
+    auto bufQ1 = q1.request();
+    auto bufQ2 = q2.request();
+    auto bufN1 = n1.request();
+    auto bufN2 = n2.request();
     
     int max_atoms1 = static_cast<int>(bufX1.shape[1]);
     int rep_size = static_cast<int>(bufX1.shape[2]);
     int max_atoms2 = static_cast<int>(bufX2.shape[1]);
     
-    // Create output array (na1+nm1, na2+nm2) - Fortran column-major
-    std::vector<ssize_t> shape = {na1 + nm1, na2 + nm2};
-    std::vector<ssize_t> strides = {sizeof(double), sizeof(double) * (na1 + nm1)};
+    // Create output array (na2*3+nm2, na1*3+nm1) - Fortran column-major
+    // Note: Fortran expects kernel(na2*3+nm2, na1*3+nm1)
+    int rows = na2 * 3 + nm2;
+    int cols = na1 * 3 + nm1;
+    std::vector<ssize_t> shape = {rows, cols};
+    std::vector<ssize_t> strides = {sizeof(double), sizeof(double) * rows};
     auto kernel = py::array_t<double>(shape, strides);
     auto bufK = kernel.request();
     
     fgaussian_process_kernel(
         static_cast<const double*>(bufX1.ptr),
         static_cast<const double*>(bufX2.ptr),
-        static_cast<const double*>(dx1.request().ptr),
-        static_cast<const double*>(dx2.request().ptr),
-        static_cast<const int*>(q1.request().ptr),
-        static_cast<const int*>(q2.request().ptr),
-        static_cast<const int*>(n1.request().ptr),
-        static_cast<const int*>(n2.request().ptr),
+        static_cast<const double*>(bufDX1.ptr),
+        static_cast<const double*>(bufDX2.ptr),
+        static_cast<const int*>(bufQ1.ptr),
+        static_cast<const int*>(bufQ2.ptr),
+        static_cast<const int*>(bufN1.ptr),
+        static_cast<const int*>(bufN2.ptr),
         nm1, nm2, na1, na2, sigma,
         static_cast<double*>(bufK.ptr),
         max_atoms1, max_atoms2, rep_size
@@ -576,21 +652,31 @@ py::array_t<double> gaussian_process_kernel_wrapper(
 
 // Wrapper for fsymmetric_gaussian_process_kernel
 py::array_t<double> symmetric_gaussian_process_kernel_wrapper(
-    py::array_t<double, py::array::f_style | py::array::forcecast> x1,
-    py::array_t<double, py::array::f_style | py::array::forcecast> dx1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> q1,
-    py::array_t<int, py::array::f_style | py::array::forcecast> n1,
+    py::array_t<double, py::array::f_style | py::array::forcecast> x1_in,
+    py::array_t<double, py::array::f_style | py::array::forcecast> dx1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> q1_in,
+    py::array_t<int, py::array::f_style | py::array::forcecast> n1_in,
     int nm1,
     int na1,
     double sigma
 ) {
+    // Ensure converted arrays stay alive
+    auto x1 = py::array_t<double, py::array::f_style | py::array::forcecast>(x1_in);
+    auto dx1 = py::array_t<double, py::array::f_style | py::array::forcecast>(dx1_in);
+    auto q1 = py::array_t<int, py::array::f_style | py::array::forcecast>(q1_in);
+    auto n1 = py::array_t<int, py::array::f_style | py::array::forcecast>(n1_in);
+    
     auto bufX1 = x1.request();
+    auto bufDX1 = dx1.request();
+    auto bufQ1 = q1.request();
+    auto bufN1 = n1.request();
     
     int max_atoms1 = static_cast<int>(bufX1.shape[1]);
     int rep_size = static_cast<int>(bufX1.shape[2]);
     
-    // Create output array (na1+nm1, na1+nm1) - Fortran column-major
-    int size = na1 + nm1;
+    // Create output array (na1*3+nm1, na1*3+nm1) - Fortran column-major
+    // Note: Fortran expects kernel(na1*3+nm1, na1*3+nm1)
+    int size = na1 * 3 + nm1;
     std::vector<ssize_t> shape = {size, size};
     std::vector<ssize_t> strides = {sizeof(double), sizeof(double) * size};
     auto kernel = py::array_t<double>(shape, strides);
@@ -598,9 +684,9 @@ py::array_t<double> symmetric_gaussian_process_kernel_wrapper(
     
     fsymmetric_gaussian_process_kernel(
         static_cast<const double*>(bufX1.ptr),
-        static_cast<const double*>(dx1.request().ptr),
-        static_cast<const int*>(q1.request().ptr),
-        static_cast<const int*>(n1.request().ptr),
+        static_cast<const double*>(bufDX1.ptr),
+        static_cast<const int*>(bufQ1.ptr),
+        static_cast<const int*>(bufN1.ptr),
         nm1, na1, sigma,
         static_cast<double*>(bufK.ptr),
         max_atoms1, rep_size
