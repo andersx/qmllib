@@ -49,8 +49,8 @@ KERNEL_ARGS = {
     },
 }
 
-LLAMBDA_ENERGY = 1e-7
-LLAMBDA_FORCE = 1e-7
+LLAMBDA_ENERGY = 1e-4
+LLAMBDA_FORCE = 1e-4
 
 
 # pytest.skip(allow_module_level=True, reason="Test is broken")
@@ -435,33 +435,28 @@ if __name__ == "__main__":
 
 
 def test_symmetric_hessian_simple():
-    """Test that symmetric hessian kernels can be computed without errors."""
-    from qmllib.representations.fchl import (
-        generate_fchl18_displaced,
-        get_local_symmetric_hessian_kernels,
+    """Test that symmetric hessian kernels can be computed without errors using real molecular data."""
+    from qmllib.representations.fchl import get_local_symmetric_hessian_kernels
+
+    # Use real molecular data from CSV
+    Xall, Fall, Eall, dXall, dXall5 = csv_to_molecular_reps(
+        CSV_FILE, force_key=FORCE_KEY, energy_key=ENERGY_KEY
     )
 
-    # Simple test with 2 molecules
-    coords1 = np.array([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
-    coords2 = np.array([[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
-    nuclear_charges1 = [1, 1]
-    nuclear_charges2 = [1, 1, 1]
-
-    disp_rep1 = generate_fchl18_displaced(
-        nuclear_charges1, coords1, max_size=5, cut_distance=1e6, dx=0.005
-    )
-    disp_rep2 = generate_fchl18_displaced(
-        nuclear_charges2, coords2, max_size=5, cut_distance=1e6, dx=0.005
-    )
-
-    dX = np.array([disp_rep1, disp_rep2])
+    # Use first 3 molecules for testing
+    dX = dXall[:3]
 
     # Test symmetric hessian kernels
-    result = get_local_symmetric_hessian_kernels(
-        dX, dx=0.005, kernel="gaussian", kernel_args={"sigma": [2.5]}
-    )
+    result = get_local_symmetric_hessian_kernels(dX, dx=DX, **KERNEL_ARGS)
 
-    assert result.shape[0] == 1, "Wrong number of sigmas"
+    # Count total force components
+    naq = sum([Fall[i].shape[0] * Fall[i].shape[1] for i in range(3)])
+
+    assert result.shape[0] == len(SIGMAS), (
+        f"Wrong number of sigmas: {result.shape[0]} != {len(SIGMAS)}"
+    )
+    assert result.shape[1] == naq, f"Wrong dimension 1: {result.shape[1]} != {naq}"
+    assert result.shape[2] == naq, f"Wrong dimension 2: {result.shape[2]} != {naq}"
     assert result.shape[1] == result.shape[2], "Hessian kernel not square"
     assert np.all(np.isfinite(result)), "Hessian kernel contains NaN/Inf"
 
@@ -470,42 +465,36 @@ def test_symmetric_hessian_simple():
 
 
 def test_hessian_simple():
-    """Test that asymmetric hessian kernels can be computed without errors."""
-    from qmllib.representations.fchl import (
-        generate_fchl18_displaced,
-        get_local_hessian_kernels,
+    """Test that asymmetric hessian kernels can be computed without errors using real molecular data."""
+    from qmllib.representations.fchl import get_local_hessian_kernels
+
+    # Use real molecular data from CSV
+    Xall, Fall, Eall, dXall, dXall5 = csv_to_molecular_reps(
+        CSV_FILE, force_key=FORCE_KEY, energy_key=ENERGY_KEY
     )
 
-    # Simple test with 2 molecules
-    coords1 = np.array([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
-    coords2 = np.array([[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
-    nuclear_charges1 = [1, 1]
-    nuclear_charges2 = [1, 1, 1]
-
-    disp_rep1 = generate_fchl18_displaced(
-        nuclear_charges1, coords1, max_size=5, cut_distance=1e6, dx=0.005
-    )
-    disp_rep2 = generate_fchl18_displaced(
-        nuclear_charges2, coords2, max_size=5, cut_distance=1e6, dx=0.005
-    )
-
-    dX1 = np.array([disp_rep1])
-    dX2 = np.array([disp_rep2])
+    # Use first 2 molecules for set 1, next 2 for set 2
+    dX1 = dXall[:2]
+    dX2 = dXall[2:4]
 
     # Test asymmetric hessian kernels
-    result = get_local_hessian_kernels(
-        dX1, dX2, dx=0.005, kernel="gaussian", kernel_args={"sigma": [2.5]}
-    )
+    result = get_local_hessian_kernels(dX1, dX2, dx=DX, **KERNEL_ARGS)
 
-    assert result.shape[0] == 1, "Wrong number of sigmas"
-    assert result.shape[1] == 2 * 3, "Wrong size for naq1 (2 atoms * 3 coords)"
-    assert result.shape[2] == 3 * 3, "Wrong size for naq2 (3 atoms * 3 coords)"
+    # Count force components
+    naq1 = sum([Fall[i].shape[0] * Fall[i].shape[1] for i in range(2)])
+    naq2 = sum([Fall[i].shape[0] * Fall[i].shape[1] for i in range(2, 4)])
+
+    assert result.shape[0] == len(SIGMAS), (
+        f"Wrong number of sigmas: {result.shape[0]} != {len(SIGMAS)}"
+    )
+    assert result.shape[1] == naq1, f"Wrong size for naq1: {result.shape[1]} != {naq1}"
+    assert result.shape[2] == naq2, f"Wrong size for naq2: {result.shape[2]} != {naq2}"
     assert np.all(np.isfinite(result)), "Hessian kernel contains NaN/Inf"
 
 
 def test_gaussian_process_kernels_simple():
     """
-    Test that gaussian process kernels are computed correctly.
+    Test that gaussian process kernels are computed correctly with real molecular data.
 
     The GP kernel combines four components into one matrix:
     - Top-left (nm1 x nm1): K_uu = local kernel (energy-energy)
@@ -516,43 +505,39 @@ def test_gaussian_process_kernels_simple():
     This follows the pattern from test_gp_kernel in test_kernel_derivatives.py
     """
     from qmllib.representations.fchl import (
-        generate_fchl18,
-        generate_fchl18_displaced,
         get_gaussian_process_kernels,
         get_local_kernels,
     )
 
-    # Simple test with 2 molecules
-    coords1 = np.array([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
-    coords2 = np.array([[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
-    nuclear_charges1 = [1, 1]
-    nuclear_charges2 = [1, 1, 1]
-
-    # Generate standard representations for x1 (energy)
-    rep1 = generate_fchl18(nuclear_charges1, coords1, max_size=5, cut_distance=1e6)
-    rep2 = generate_fchl18(nuclear_charges2, coords2, max_size=5, cut_distance=1e6)
-    X = np.array([rep1, rep2])
-
-    # Generate displaced representations for x2 (forces)
-    disp_rep1 = generate_fchl18_displaced(
-        nuclear_charges1, coords1, max_size=5, cut_distance=1e6, dx=0.005
+    # Load real molecular data from CSV
+    X, F, E, dX, dX5 = csv_to_molecular_reps(
+        CSV_FILE, force_key=FORCE_KEY, energy_key=ENERGY_KEY
     )
-    disp_rep2 = generate_fchl18_displaced(
-        nuclear_charges2, coords2, max_size=5, cut_distance=1e6, dx=0.005
-    )
-    dX = np.array([disp_rep1, disp_rep2])
 
-    nm1 = 2  # number of molecules
-    naq2 = 2 * 3 + 3 * 3  # total force components: 2 atoms * 3 + 3 atoms * 3 = 15
+    # Use first 2 molecules for testing
+    X = X[:2]
+    dX = dX[:2]
 
-    dx = 0.005
-    kernel_args = {"kernel": "gaussian", "kernel_args": {"sigma": [2.5]}}
+    # Get nuclear charges from CSV to calculate dimensions
+    nuclear_charges_list = []
+    with open(CSV_FILE, "r") as csvfile:
+        df = csv.reader(csvfile, delimiter=";", quotechar="#")
+        for i, row in enumerate(df):
+            if i >= 2:  # only need first 2 molecules
+                break
+            nuclear_charges_list.append(ast.literal_eval(row[5]))
+
+    # Calculate dimensions
+    nm1 = len(X)  # number of molecules
+    naq2 = sum(len(nc) * 3 for nc in nuclear_charges_list)  # total force components
 
     # Get the full GP kernel
-    K_gp = get_gaussian_process_kernels(X, dX, dx=dx, **kernel_args)
+    K_gp = get_gaussian_process_kernels(X, dX, dx=DX, **KERNEL_ARGS)
 
     # Check overall shape
-    assert K_gp.shape[0] == 1, "Wrong number of sigmas"
+    assert K_gp.shape[0] == len(SIGMAS), (
+        f"Wrong number of sigmas: {K_gp.shape[0]} != {len(SIGMAS)}"
+    )
     assert K_gp.shape[1] == nm1 + naq2, (
         f"Wrong size for dimension 1: {K_gp.shape[1]} != {nm1 + naq2}"
     )
@@ -561,14 +546,14 @@ def test_gaussian_process_kernels_simple():
     )
     assert np.all(np.isfinite(K_gp)), "Gaussian process kernel contains NaN/Inf"
 
-    # Extract the four blocks
+    # Extract the four blocks (using first sigma)
     K_uu = K_gp[0, :nm1, :nm1]  # Top-left: energy-energy (local kernel)
     K_ug = K_gp[0, :nm1, nm1:]  # Top-right: energy-force (gradient)
     K_gu = K_gp[0, nm1:, :nm1]  # Bottom-left: force-energy (gradient transposed)
     K_gg = K_gp[0, nm1:, nm1:]  # Bottom-right: force-force (hessian)
 
     # Test 1: Top-left block should match local kernel (energy-energy)
-    K_local = get_local_kernels(X, X, **kernel_args)
+    K_local = get_local_kernels(X, X, **KERNEL_ARGS)
     assert np.allclose(K_uu, K_local[0]), (
         f"Error: GP kernel top-left (K_uu) doesn't match local kernel\nMax diff: {np.max(np.abs(K_uu - K_local[0]))}"
     )
