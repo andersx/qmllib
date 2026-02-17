@@ -503,11 +503,22 @@ def test_hessian_simple():
 
 
 def test_gaussian_process_kernels_simple():
-    """Test that gaussian process kernels (kernel + gradient + hessian) can be computed without errors."""
+    """
+    Test that gaussian process kernels are computed correctly.
+
+    The GP kernel combines four components into one matrix:
+    - Top-left (nm1 x nm1): K_uu = local kernel (energy-energy)
+    - Top-right (nm1 x naq2): K_ug = gradient kernel (energy-force)
+    - Bottom-left (naq2 x nm1): K_gu = gradient kernel transposed (force-energy)
+    - Bottom-right (naq2 x naq2): K_gg = hessian kernel (force-force)
+
+    This follows the pattern from test_gp_kernel in test_kernel_derivatives.py
+    """
     from qmllib.representations.fchl import (
         generate_fchl18,
         generate_fchl18_displaced,
         get_gaussian_process_kernels,
+        get_local_kernels,
     )
 
     # Simple test with 2 molecules
@@ -516,12 +527,12 @@ def test_gaussian_process_kernels_simple():
     nuclear_charges1 = [1, 1]
     nuclear_charges2 = [1, 1, 1]
 
-    # Generate standard representations for x1
+    # Generate standard representations for x1 (energy)
     rep1 = generate_fchl18(nuclear_charges1, coords1, max_size=5, cut_distance=1e6)
     rep2 = generate_fchl18(nuclear_charges2, coords2, max_size=5, cut_distance=1e6)
     X = np.array([rep1, rep2])
 
-    # Generate displaced representations for x2
+    # Generate displaced representations for x2 (forces)
     disp_rep1 = generate_fchl18_displaced(
         nuclear_charges1, coords1, max_size=5, cut_distance=1e6, dx=0.005
     )
@@ -530,19 +541,59 @@ def test_gaussian_process_kernels_simple():
     )
     dX = np.array([disp_rep1, disp_rep2])
 
-    # Test gaussian process kernels (combines kernel, gradient, and hessian)
-    result = get_gaussian_process_kernels(
-        X, dX, dx=0.005, kernel="gaussian", kernel_args={"sigma": [2.5]}
-    )
-
     nm1 = 2  # number of molecules
     naq2 = 2 * 3 + 3 * 3  # total force components: 2 atoms * 3 + 3 atoms * 3 = 15
 
-    assert result.shape[0] == 1, "Wrong number of sigmas"
-    assert result.shape[1] == nm1 + naq2, (
-        f"Wrong size for dimension 1: {result.shape[1]} != {nm1 + naq2}"
+    dx = 0.005
+    kernel_args = {"kernel": "gaussian", "kernel_args": {"sigma": [2.5]}}
+
+    # Get the full GP kernel
+    K_gp = get_gaussian_process_kernels(X, dX, dx=dx, **kernel_args)
+
+    # Check overall shape
+    assert K_gp.shape[0] == 1, "Wrong number of sigmas"
+    assert K_gp.shape[1] == nm1 + naq2, (
+        f"Wrong size for dimension 1: {K_gp.shape[1]} != {nm1 + naq2}"
     )
-    assert result.shape[2] == nm1 + naq2, (
-        f"Wrong size for dimension 2: {result.shape[2]} != {nm1 + naq2}"
+    assert K_gp.shape[2] == nm1 + naq2, (
+        f"Wrong size for dimension 2: {K_gp.shape[2]} != {nm1 + naq2}"
     )
-    assert np.all(np.isfinite(result)), "Gaussian process kernel contains NaN/Inf"
+    assert np.all(np.isfinite(K_gp)), "Gaussian process kernel contains NaN/Inf"
+
+    # Extract the four blocks
+    K_uu = K_gp[0, :nm1, :nm1]  # Top-left: energy-energy (local kernel)
+    K_ug = K_gp[0, :nm1, nm1:]  # Top-right: energy-force (gradient)
+    K_gu = K_gp[0, nm1:, :nm1]  # Bottom-left: force-energy (gradient transposed)
+    K_gg = K_gp[0, nm1:, nm1:]  # Bottom-right: force-force (hessian)
+
+    # Test 1: Top-left block should match local kernel (energy-energy)
+    K_local = get_local_kernels(X, X, **kernel_args)
+    assert np.allclose(K_uu, K_local[0]), (
+        f"Error: GP kernel top-left (K_uu) doesn't match local kernel\nMax diff: {np.max(np.abs(K_uu - K_local[0]))}"
+    )
+
+    # Test 2: Verify symmetry relationship between off-diagonal blocks
+    # K_gu should be transpose of K_ug (gradient blocks are transposes of each other)
+    assert np.allclose(K_gu, K_ug.T), (
+        f"Error: K_gu is not transpose of K_ug\nMax diff: {np.max(np.abs(K_gu - K_ug.T))}"
+    )
+
+    # Test 3: Verify all blocks have finite values
+    assert np.all(np.isfinite(K_uu)), "K_uu (energy-energy) contains NaN/Inf"
+    assert np.all(np.isfinite(K_ug)), "K_ug (energy-force) contains NaN/Inf"
+    assert np.all(np.isfinite(K_gu)), "K_gu (force-energy) contains NaN/Inf"
+    assert np.all(np.isfinite(K_gg)), "K_gg (force-force) contains NaN/Inf"
+
+    # Test 4: Verify blocks have expected shapes
+    assert K_uu.shape == (nm1, nm1), (
+        f"K_uu shape is {K_uu.shape}, expected ({nm1}, {nm1})"
+    )
+    assert K_ug.shape == (nm1, naq2), (
+        f"K_ug shape is {K_ug.shape}, expected ({nm1}, {naq2})"
+    )
+    assert K_gu.shape == (naq2, nm1), (
+        f"K_gu shape is {K_gu.shape}, expected ({naq2}, {nm1})"
+    )
+    assert K_gg.shape == (naq2, naq2), (
+        f"K_gg shape is {K_gg.shape}, expected ({naq2}, {naq2})"
+    )
