@@ -11,7 +11,7 @@ from .ffchl_module import (
     #     fget_force_alphas_fchl,
     #     fget_gaussian_process_kernels_fchl,
     fget_local_gradient_kernels_fchl,
-    #     fget_local_hessian_kernels_fchl,
+    fget_local_hessian_kernels_fchl,
     fget_local_symmetric_hessian_kernels_fchl,
 )
 
@@ -20,12 +20,6 @@ from .ffchl_module import (
 def fget_gaussian_process_kernels_fchl(*args, **kwargs):
     raise NotImplementedError(
         "fget_gaussian_process_kernels_fchl not yet migrated to pybind11"
-    )
-
-
-def fget_local_hessian_kernels_fchl(*args, **kwargs):
-    raise NotImplementedError(
-        "fget_local_hessian_kernels_fchl not yet migrated to pybind11"
     )
 
 

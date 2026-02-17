@@ -454,3 +454,37 @@ def test_symmetric_hessian_simple():
 
     # Note: The Hessian is NOT symmetric due to mixed derivative terms with different pm1/pm2 values
     # This is expected behavior - "symmetric" refers to computing only upper triangle (a <= b)
+
+
+def test_hessian_simple():
+    """Test that asymmetric hessian kernels can be computed without errors."""
+    from qmllib.representations.fchl import (
+        generate_fchl18_displaced,
+        get_local_hessian_kernels,
+    )
+
+    # Simple test with 2 molecules
+    coords1 = np.array([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
+    coords2 = np.array([[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+    nuclear_charges1 = [1, 1]
+    nuclear_charges2 = [1, 1, 1]
+
+    disp_rep1 = generate_fchl18_displaced(
+        nuclear_charges1, coords1, max_size=5, cut_distance=1e6, dx=0.005
+    )
+    disp_rep2 = generate_fchl18_displaced(
+        nuclear_charges2, coords2, max_size=5, cut_distance=1e6, dx=0.005
+    )
+
+    dX1 = np.array([disp_rep1])
+    dX2 = np.array([disp_rep2])
+
+    # Test asymmetric hessian kernels
+    result = get_local_hessian_kernels(
+        dX1, dX2, dx=0.005, kernel="gaussian", kernel_args={"sigma": [2.5]}
+    )
+
+    assert result.shape[0] == 1, "Wrong number of sigmas"
+    assert result.shape[1] == 2 * 3, "Wrong size for naq1 (2 atoms * 3 coords)"
+    assert result.shape[2] == 3 * 3, "Wrong size for naq2 (3 atoms * 3 coords)"
+    assert np.all(np.isfinite(result)), "Hessian kernel contains NaN/Inf"
