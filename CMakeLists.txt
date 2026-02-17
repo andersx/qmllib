@@ -54,6 +54,7 @@ add_library(qmllib_ffchl OBJECT
     src/qmllib/representations/fchl/ffchl_gradient_kernels.f90
     src/qmllib/representations/fchl/ffchl_hessian_kernels.f90
     src/qmllib/representations/fchl/ffchl_gaussian_process_kernels.f90
+    src/qmllib/representations/fchl/ffchl_atomic_local_kernels.f90
 )
 set_property(TARGET qmllib_ffchl PROPERTY POSITION_INDEPENDENT_CODE ON)
 
