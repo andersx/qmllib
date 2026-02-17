@@ -3,15 +3,52 @@ import numpy as np
 from qmllib.utils.alchemy import get_alchemy
 
 from .fchl_kernel_functions import get_kernel_parameters
+
+# TODO: Migrate these functions from f2py to pybind11
 from .ffchl_module import (
-    fget_atomic_local_gradient_5point_kernels_fchl,
-    fget_atomic_local_gradient_kernels_fchl,
-    fget_force_alphas_fchl,
-    fget_gaussian_process_kernels_fchl,
+    #     fget_atomic_local_gradient_5point_kernels_fchl,
+    #     fget_atomic_local_gradient_kernels_fchl,
+    #     fget_force_alphas_fchl,
+    #     fget_gaussian_process_kernels_fchl,
     fget_local_gradient_kernels_fchl,
-    fget_local_hessian_kernels_fchl,
-    fget_local_symmetric_hessian_kernels_fchl,
+    #     fget_local_hessian_kernels_fchl,
+    #     fget_local_symmetric_hessian_kernels_fchl,
 )
+
+
+# Temporary stubs for functions not yet migrated
+def fget_gaussian_process_kernels_fchl(*args, **kwargs):
+    raise NotImplementedError(
+        "fget_gaussian_process_kernels_fchl not yet migrated to pybind11"
+    )
+
+
+def fget_local_hessian_kernels_fchl(*args, **kwargs):
+    raise NotImplementedError(
+        "fget_local_hessian_kernels_fchl not yet migrated to pybind11"
+    )
+
+
+def fget_local_symmetric_hessian_kernels_fchl(*args, **kwargs):
+    raise NotImplementedError(
+        "fget_local_symmetric_hessian_kernels_fchl not yet migrated to pybind11"
+    )
+
+
+def fget_force_alphas_fchl(*args, **kwargs):
+    raise NotImplementedError("fget_force_alphas_fchl not yet migrated to pybind11")
+
+
+def fget_atomic_local_gradient_kernels_fchl(*args, **kwargs):
+    raise NotImplementedError(
+        "fget_atomic_local_gradient_kernels_fchl not yet migrated to pybind11"
+    )
+
+
+def fget_atomic_local_gradient_5point_kernels_fchl(*args, **kwargs):
+    raise NotImplementedError(
+        "fget_atomic_local_gradient_5point_kernels_fchl not yet migrated to pybind11"
+    )
 
 
 def get_gaussian_process_kernels(
@@ -34,7 +71,6 @@ def get_gaussian_process_kernels(
     kernel="gaussian",
     kernel_args=None,
 ):
-
     nm1 = A.shape[0]
     nm2 = B.shape[0]
 
@@ -77,7 +113,9 @@ def get_gaussian_process_kernels(
             for pm in range(2):
                 for i in range(ni):
                     for a, x in enumerate(B[m, xyz, pm, i, :ni]):
-                        neighbors2[m, xyz, pm, i, a] = len(np.where(x[0] < cut_distance)[0])
+                        neighbors2[m, xyz, pm, i, a] = len(
+                            np.where(x[0] < cut_distance)[0]
+                        )
 
     doalchemy, pd = get_alchemy(
         alchemy, emax=100, r_width=alchemy_group_width, c_width=alchemy_period_width
@@ -136,7 +174,6 @@ def get_local_gradient_kernels(
     kernel="gaussian",
     kernel_args=None,
 ):
-
     nm1 = A.shape[0]
     nm2 = B.shape[0]
 
@@ -180,7 +217,9 @@ def get_local_gradient_kernels(
             for pm in range(2):
                 for i in range(ni):
                     for a, x in enumerate(B[m, xyz, pm, i, :ni]):
-                        neighbors2[m, xyz, pm, i, a] = len(np.where(x[0] < cut_distance)[0])
+                        neighbors2[m, xyz, pm, i, a] = len(
+                            np.where(x[0] < cut_distance)[0]
+                        )
 
     doalchemy, pd = get_alchemy(
         alchemy, emax=100, r_width=alchemy_group_width, c_width=alchemy_period_width
@@ -239,7 +278,6 @@ def get_local_hessian_kernels(
     kernel="gaussian",
     kernel_args=None,
 ):
-
     nm1 = A.shape[0]
     nm2 = B.shape[0]
 
@@ -278,7 +316,9 @@ def get_local_hessian_kernels(
             for pm in range(2):
                 for i in range(ni):
                     for a, x in enumerate(A[m, xyz, pm, i, :ni]):
-                        neighbors1[m, xyz, pm, i, a] = len(np.where(x[0] < cut_distance)[0])
+                        neighbors1[m, xyz, pm, i, a] = len(
+                            np.where(x[0] < cut_distance)[0]
+                        )
 
     for m in range(nm2):
         ni = N2[m]
@@ -286,7 +326,9 @@ def get_local_hessian_kernels(
             for pm in range(2):
                 for i in range(ni):
                     for a, x in enumerate(B[m, xyz, pm, i, :ni]):
-                        neighbors2[m, xyz, pm, i, a] = len(np.where(x[0] < cut_distance)[0])
+                        neighbors2[m, xyz, pm, i, a] = len(
+                            np.where(x[0] < cut_distance)[0]
+                        )
 
     doalchemy, pd = get_alchemy(
         alchemy, emax=100, r_width=alchemy_group_width, c_width=alchemy_period_width
@@ -347,7 +389,6 @@ def get_local_symmetric_hessian_kernels(
     kernel="gaussian",
     kernel_args=None,
 ):
-
     nm1 = A.shape[0]
 
     atoms_max = A.shape[4]
@@ -375,7 +416,9 @@ def get_local_symmetric_hessian_kernels(
             for pm in range(2):
                 for i in range(ni):
                     for a, x in enumerate(A[m, xyz, pm, i, :ni]):
-                        neighbors1[m, xyz, pm, i, a] = len(np.where(x[0] < cut_distance)[0])
+                        neighbors1[m, xyz, pm, i, a] = len(
+                            np.where(x[0] < cut_distance)[0]
+                        )
 
     doalchemy, pd = get_alchemy(
         alchemy, emax=100, r_width=alchemy_group_width, c_width=alchemy_period_width
@@ -476,7 +519,9 @@ def get_force_alphas(
             for pm in range(2):
                 for i in range(ni):
                     for a, x in enumerate(B[m, xyz, pm, i, :ni]):
-                        neighbors2[m, xyz, pm, i, a] = len(np.where(x[0] < cut_distance)[0])
+                        neighbors2[m, xyz, pm, i, a] = len(
+                            np.where(x[0] < cut_distance)[0]
+                        )
 
     doalchemy, pd = get_alchemy(
         alchemy, emax=100, r_width=alchemy_group_width, c_width=alchemy_period_width
@@ -543,7 +588,6 @@ def get_atomic_local_gradient_kernels(
     kernel="gaussian",
     kernel_args=None,
 ):
-
     nm1 = A.shape[0]
     nm2 = B.shape[0]
 
@@ -587,7 +631,9 @@ def get_atomic_local_gradient_kernels(
             for pm in range(2):
                 for i in range(ni):
                     for a, x in enumerate(B[m, xyz, pm, i, :ni]):
-                        neighbors2[m, xyz, pm, i, a] = len(np.where(x[0] < cut_distance)[0])
+                        neighbors2[m, xyz, pm, i, a] = len(
+                            np.where(x[0] < cut_distance)[0]
+                        )
 
     doalchemy, pd = get_alchemy(
         alchemy, emax=100, r_width=alchemy_group_width, c_width=alchemy_period_width
@@ -648,7 +694,6 @@ def get_atomic_local_gradient_5point_kernels(
     kernel="gaussian",
     kernel_args=None,
 ):
-
     nm1 = A.shape[0]
     nm2 = B.shape[0]
 
@@ -692,7 +737,9 @@ def get_atomic_local_gradient_5point_kernels(
             for pm in range(5):
                 for i in range(ni):
                     for a, x in enumerate(B[m, xyz, pm, i, :ni]):
-                        neighbors2[m, xyz, pm, i, a] = len(np.where(x[0] < cut_distance)[0])
+                        neighbors2[m, xyz, pm, i, a] = len(
+                            np.where(x[0] < cut_distance)[0]
+                        )
 
     doalchemy, pd = get_alchemy(
         alchemy, emax=100, r_width=alchemy_group_width, c_width=alchemy_period_width
