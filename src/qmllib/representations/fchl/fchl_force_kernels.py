@@ -8,19 +8,12 @@ from .fchl_kernel_functions import get_kernel_parameters
 from .ffchl_module import (
     fget_atomic_local_gradient_5point_kernels_fchl,
     fget_atomic_local_gradient_kernels_fchl,
-    #     fget_force_alphas_fchl,
+    fget_force_alphas_fchl,
     fget_gaussian_process_kernels_fchl,
     fget_local_gradient_kernels_fchl,
     fget_local_hessian_kernels_fchl,
     fget_local_symmetric_hessian_kernels_fchl,
 )
-
-
-# Temporary stubs for functions not yet migrated
-
-
-def fget_force_alphas_fchl(*args, **kwargs):
-    raise NotImplementedError("fget_force_alphas_fchl not yet migrated to pybind11")
 
 
 def get_gaussian_process_kernels(
