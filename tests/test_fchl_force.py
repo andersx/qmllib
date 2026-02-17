@@ -488,3 +488,49 @@ def test_hessian_simple():
     assert result.shape[1] == 2 * 3, "Wrong size for naq1 (2 atoms * 3 coords)"
     assert result.shape[2] == 3 * 3, "Wrong size for naq2 (3 atoms * 3 coords)"
     assert np.all(np.isfinite(result)), "Hessian kernel contains NaN/Inf"
+
+
+def test_gaussian_process_kernels_simple():
+    """Test that gaussian process kernels (kernel + gradient + hessian) can be computed without errors."""
+    from qmllib.representations.fchl import (
+        generate_fchl18,
+        generate_fchl18_displaced,
+        get_gaussian_process_kernels,
+    )
+
+    # Simple test with 2 molecules
+    coords1 = np.array([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0]])
+    coords2 = np.array([[0.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]])
+    nuclear_charges1 = [1, 1]
+    nuclear_charges2 = [1, 1, 1]
+
+    # Generate standard representations for x1
+    rep1 = generate_fchl18(nuclear_charges1, coords1, max_size=5, cut_distance=1e6)
+    rep2 = generate_fchl18(nuclear_charges2, coords2, max_size=5, cut_distance=1e6)
+    X = np.array([rep1, rep2])
+
+    # Generate displaced representations for x2
+    disp_rep1 = generate_fchl18_displaced(
+        nuclear_charges1, coords1, max_size=5, cut_distance=1e6, dx=0.005
+    )
+    disp_rep2 = generate_fchl18_displaced(
+        nuclear_charges2, coords2, max_size=5, cut_distance=1e6, dx=0.005
+    )
+    dX = np.array([disp_rep1, disp_rep2])
+
+    # Test gaussian process kernels (combines kernel, gradient, and hessian)
+    result = get_gaussian_process_kernels(
+        X, dX, dx=0.005, kernel="gaussian", kernel_args={"sigma": [2.5]}
+    )
+
+    nm1 = 2  # number of molecules
+    naq2 = 2 * 3 + 3 * 3  # total force components: 2 atoms * 3 + 3 atoms * 3 = 15
+
+    assert result.shape[0] == 1, "Wrong number of sigmas"
+    assert result.shape[1] == nm1 + naq2, (
+        f"Wrong size for dimension 1: {result.shape[1]} != {nm1 + naq2}"
+    )
+    assert result.shape[2] == nm1 + naq2, (
+        f"Wrong size for dimension 2: {result.shape[2]} != {nm1 + naq2}"
+    )
+    assert np.all(np.isfinite(result)), "Gaussian process kernel contains NaN/Inf"
