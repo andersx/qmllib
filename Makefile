@@ -33,10 +33,11 @@ stubs:
 	stubgen -p qmllib.representations.fchl.ffchl_module -o stubs_temp
 	@echo "Moving stubs to src/qmllib/..."
 	@mv stubs_temp/qmllib/*.pyi src/qmllib/
-	@mkdir -p src/qmllib/representations/fchl/ffchl_module
-	@mv stubs_temp/qmllib/representations/fchl/ffchl_module/*.pyi src/qmllib/representations/fchl/ffchl_module/ || true
+	@mv stubs_temp/qmllib/representations/fchl/ffchl_module/*.pyi src/qmllib/representations/fchl/ || true
 	@rm -rf stubs_temp
-	@echo "Stubs generated successfully!"
+	@echo "Formatting stub files with ruff..."
+	ruff format src/qmllib/**/*.pyi
+	@echo "Stubs generated and formatted successfully!"
 
 clean:                             
 	find ./src/ -type f \          
