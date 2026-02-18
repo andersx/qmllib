@@ -17,7 +17,7 @@ format:
 	ruff check --fix src/ tests/
 
 types:
-	mypy src/ tests/
+	ty check src/ --exclude tests/
 
 clean:                             
 	find ./src/ -type f \          

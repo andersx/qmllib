@@ -30,7 +30,7 @@ dependencies = [
 test = ["pytest>=8", "pytest-xdist", "pytest-cov", "pytest-timeout"]
 dev = [
     "ruff>=0.8.0",
-    "mypy>=1.9.0",
+    "ty>=0.0.1",
     "pre-commit>=3.6.0",
 ]
 
@@ -81,31 +81,22 @@ known-first-party = ["qmllib"]
 "src/qmllib/solvers/*" = ["N803", "N806", "E501"]
 "src/qmllib/utils/alchemy.py" = ["N802"]  # QNum_distance follows domain naming convention
 
-[tool.mypy]
-python_version = "3.10"
-warn_unused_configs = true
-# Note: Strict mode disabled due to heavy use of Fortran extensions without type stubs
+[tool.ty]
+# Note: Type checking configured for scientific code with extensive Fortran extensions
 # This codebase interfaces extensively with Fortran/C code which lacks type information
-# Mypy is configured to catch obvious errors without being overly strict
-warn_redundant_casts = true
-no_implicit_optional = false  # Allow None defaults without Optional[]
-# Disabled checks due to Fortran/C extensions:
-# - check_untyped_defs: Fortran interop makes full typing impractical
-# - disallow_untyped_defs: Many Fortran functions lack types
-# - warn_return_any: Fortran functions return Any
+# ty is configured to be pragmatic about type checking in this context
 
-# Disable specific error codes that are impractical for scientific code with Fortran
-# TODO: Incrementally fix these by improving type annotations
-disable_error_code = [
-    "import-untyped",      # Fortran modules lack stubs
-    "import-not-found",    # Optional dependencies
-    "attr-defined",        # Dynamic attributes from Fortran
-    "assignment",          # Type mismatches (many from numpy/list confusion)
-    "arg-type",            # Argument type issues (complex union types)
-    "list-item",           # List item type mismatches
-]
+[tool.ty.environment]
+root = ["src"]
 
-# Exclude tests from type checking
-[[tool.mypy.overrides]]
-module = "tests.*"
-ignore_errors = true
+# Ignore common issues with Fortran/C extension modules
+# These can be fixed incrementally by improving type annotations
+[tool.ty.rules]
+# Fortran extension modules don't have type stubs
+unresolved-import = "ignore"
+# Type mismatches common with numpy arrays and Fortran code
+invalid-assignment = "ignore"
+invalid-argument-type = "ignore"
+invalid-parameter-default = "ignore"
+no-matching-overload = "ignore"
+unresolved-attribute = "ignore"
