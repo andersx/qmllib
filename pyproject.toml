@@ -82,21 +82,18 @@ known-first-party = ["qmllib"]
 "src/qmllib/utils/alchemy.py" = ["N802"]  # QNum_distance follows domain naming convention
 
 [tool.ty]
-# Note: Type checking configured for scientific code with extensive Fortran extensions
-# This codebase interfaces extensively with Fortran/C code which lacks type information
-# ty is configured to be pragmatic about type checking in this context
+# Type checking with ty (Astral's extremely fast Python type checker)
+# All Fortran/pybind11 modules have .pyi stub files for proper type checking
 
 [tool.ty.environment]
 root = ["src"]
 
-# Ignore common issues with Fortran/C extension modules
-# These can be fixed incrementally by improving type annotations
+# Temporarily ignore some errors until types are fully refined
+# TODO: Fix these incrementally by improving type annotations
 [tool.ty.rules]
-# Fortran extension modules don't have type stubs
-unresolved-import = "ignore"
-# Type mismatches common with numpy arrays and Fortran code
-invalid-assignment = "ignore"
-invalid-argument-type = "ignore"
-invalid-parameter-default = "ignore"
-no-matching-overload = "ignore"
-unresolved-attribute = "ignore"
+invalid-assignment = "ignore"  # Variable type mismatches (list vs ndarray)
+invalid-argument-type = "ignore"  # Function argument union type issues
+invalid-parameter-default = "ignore"  # None defaults without | None
+unresolved-attribute = "ignore"  # Accessing attributes on unions
+no-matching-overload = "ignore"  # Complex function overloading
+unresolved-import = "ignore"  # Optional fallback modules (fsolvers, etc.)
