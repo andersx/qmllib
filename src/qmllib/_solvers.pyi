@@ -1,6 +1,7 @@
+import typing
+
 import numpy
 import numpy.typing
-import typing
 
 def fbkf_invert(A: typing.Annotated[numpy.typing.ArrayLike, numpy.float64]) -> numpy.typing.NDArray[numpy.float64]: ...
 def fbkf_solve(A: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], y: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], x: typing.Annotated[numpy.typing.ArrayLike, numpy.float64]) -> None: ...

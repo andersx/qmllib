@@ -1,6 +1,7 @@
+import typing
+
 import numpy
 import numpy.typing
-import typing
 
 def fgaussian_kernel(a: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], b: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], sigma: typing.SupportsFloat) -> numpy.typing.NDArray[numpy.float64]: ...
 def fgaussian_kernel_symmetric(x: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], sigma: typing.SupportsFloat) -> numpy.typing.NDArray[numpy.float64]: ...

@@ -80,6 +80,8 @@ known-first-party = ["qmllib"]
 "src/qmllib/representations/*" = ["N803", "N806", "E501", "B008", "E741"]
 "src/qmllib/solvers/*" = ["N803", "N806", "E501"]
 "src/qmllib/utils/alchemy.py" = ["N802"]  # QNum_distance follows domain naming convention
+# Auto-generated type stub files - ignore all style issues
+"**/*.pyi" = ["E501", "N803", "N806", "I001"]
 
 [tool.ty]
 # Type checking with ty (Astral's extremely fast Python type checker)

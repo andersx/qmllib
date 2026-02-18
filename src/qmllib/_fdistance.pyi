@@ -1,6 +1,7 @@
+import typing
+
 import numpy
 import numpy.typing
-import typing
 
 def fl2_distance(a: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], b: typing.Annotated[numpy.typing.ArrayLike, numpy.float64]) -> numpy.typing.NDArray[numpy.float64]: ...
 def fmanhattan_distance(a: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], b: typing.Annotated[numpy.typing.ArrayLike, numpy.float64]) -> numpy.typing.NDArray[numpy.float64]: ...

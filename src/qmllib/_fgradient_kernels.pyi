@@ -1,6 +1,7 @@
+import typing
+
 import numpy
 import numpy.typing
-import typing
 
 def fatomic_local_gradient_kernel(x1: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], x2: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], dx2: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], q1: typing.Annotated[numpy.typing.ArrayLike, numpy.int32], q2: typing.Annotated[numpy.typing.ArrayLike, numpy.int32], n1: typing.Annotated[numpy.typing.ArrayLike, numpy.int32], n2: typing.Annotated[numpy.typing.ArrayLike, numpy.int32], nm1: typing.SupportsInt, nm2: typing.SupportsInt, na1: typing.SupportsInt, naq2: typing.SupportsInt, sigma: typing.SupportsFloat) -> numpy.typing.NDArray[numpy.float64]: ...
 def fatomic_local_kernel(x1: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], x2: typing.Annotated[numpy.typing.ArrayLike, numpy.float64], q1: typing.Annotated[numpy.typing.ArrayLike, numpy.int32], q2: typing.Annotated[numpy.typing.ArrayLike, numpy.int32], n1: typing.Annotated[numpy.typing.ArrayLike, numpy.int32], n2: typing.Annotated[numpy.typing.ArrayLike, numpy.int32], nm1: typing.SupportsInt, nm2: typing.SupportsInt, na1: typing.SupportsInt, sigma: typing.SupportsFloat) -> numpy.typing.NDArray[numpy.float64]: ...
