@@ -1,4 +1,4 @@
-.PHONY: install install-dev test check format typing clean help
+.PHONY: install install-dev test check format typing stubs clean help
 
 install:
 	pip install -e .[test] --verbose
@@ -18,6 +18,25 @@ format:
 
 types:
 	ty check src/ --exclude tests/
+
+stubs:
+	@echo "Generating type stubs for Fortran/pybind11 modules..."
+	@mkdir -p stubs_temp
+	stubgen -p qmllib._fdistance -o stubs_temp
+	stubgen -p qmllib._fgradient_kernels -o stubs_temp
+	stubgen -p qmllib._fkernels -o stubs_temp
+	stubgen -p qmllib._facsf -o stubs_temp
+	stubgen -p qmllib._representations -o stubs_temp
+	stubgen -p qmllib._fslatm -o stubs_temp
+	stubgen -p qmllib._solvers -o stubs_temp
+	stubgen -p qmllib._utils -o stubs_temp
+	stubgen -p qmllib.representations.fchl.ffchl_module -o stubs_temp
+	@echo "Moving stubs to src/qmllib/..."
+	@mv stubs_temp/qmllib/*.pyi src/qmllib/
+	@mkdir -p src/qmllib/representations/fchl/ffchl_module
+	@mv stubs_temp/qmllib/representations/fchl/ffchl_module/*.pyi src/qmllib/representations/fchl/ffchl_module/ || true
+	@rm -rf stubs_temp
+	@echo "Stubs generated successfully!"
 
 clean:                             
 	find ./src/ -type f \          
