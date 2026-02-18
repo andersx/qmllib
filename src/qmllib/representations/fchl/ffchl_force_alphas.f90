@@ -217,11 +217,13 @@ subroutine fget_force_alphas_fchl(nm1, nm2, na1, nsigmas, &
                         call kernel(self_scalar1(a, j1), self_scalar2(b, xyz2, pm2, i2, j2), s12, &
                                     kernel_idx, parameters, ktmp)
 
+                        !$OMP CRITICAL
                         if (pm2 == 2) then
                            kernel_delta(idx1, idx2, :) = kernel_delta(idx1, idx2, :) + ktmp*inv_2dx
                         else
                            kernel_delta(idx1, idx2, :) = kernel_delta(idx1, idx2, :) - ktmp*inv_2dx
                         end if
+                        !$OMP END CRITICAL
 
                      end do
                   end do
@@ -271,11 +273,13 @@ subroutine fget_force_alphas_fchl(nm1, nm2, na1, nsigmas, &
                    & t_width, d_width, cut_distance, order, &
                    & pd, ang_norm2, distance_scale, angular_scale, alchemy_logical)
 
-               ktmp = 0.0d0
-               call kernel(self_scalar1(a, i), self_scalar1(b, j), s12, &
-                           kernel_idx, parameters, ktmp)
+                ktmp = 0.0d0
+                call kernel(self_scalar1(a, i), self_scalar1(b, j), s12, &
+                            kernel_idx, parameters, ktmp)
 
-               kernel_MA(b, idx1, :) = kernel_MA(b, idx1, :) + ktmp
+                !$OMP CRITICAL
+                kernel_MA(b, idx1, :) = kernel_MA(b, idx1, :) + ktmp
+                !$OMP END CRITICAL
 
             end do
           end do
