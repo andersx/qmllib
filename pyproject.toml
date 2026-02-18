@@ -88,12 +88,4 @@ known-first-party = ["qmllib"]
 [tool.ty.environment]
 root = ["src"]
 
-# Temporarily ignore some errors until types are fully refined
-# TODO: Fix these incrementally by improving type annotations
-[tool.ty.rules]
-invalid-assignment = "ignore"  # Variable type mismatches (list vs ndarray)
-invalid-argument-type = "ignore"  # Function argument union type issues
-invalid-parameter-default = "ignore"  # None defaults without | None
-unresolved-attribute = "ignore"  # Accessing attributes on unions
-no-matching-overload = "ignore"  # Complex function overloading
-unresolved-import = "ignore"  # Optional fallback modules (fsolvers, etc.)
+# All type errors will be fixed - no ignores needed!
