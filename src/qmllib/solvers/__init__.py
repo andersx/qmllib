@@ -22,7 +22,7 @@ from qmllib._solvers import (
 
 # These are not yet migrated to pybind11, keep using f2py if available
 with contextlib.suppress(ImportError):
-    from .fsolvers import (  # type: ignore[import-not-found]
+    from .fsolvers import (  # type: ignore
         fcond,
         fcond_ge,
         fqrlq_solve,
