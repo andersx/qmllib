@@ -88,4 +88,6 @@ known-first-party = ["qmllib"]
 [tool.ty.environment]
 root = ["src"]
 
-# All type errors will be fixed - no ignores needed!
+[[tool.ty.overrides]]
+include = ["src/qmllib/representations/fchl/fchl_electric_field_kernels.py"]
+rules = { unresolved-import = "ignore" }

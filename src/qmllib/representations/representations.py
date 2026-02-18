@@ -319,7 +319,7 @@ def generate_bob(
     if asize is None:
         asize = {"O": 3, "C": 7, "N": 3, "H": 16, "S": 1}
     n = 0
-    atoms = sorted(asize, key=asize.get)
+    atoms = sorted(asize, key=lambda x: int(asize.get(x, 0)))
     nmax = np.array([asize[key] for key in atoms], dtype=np.int32)
     ids = np.zeros(len(nmax), dtype=np.int32)
     for i, (key, value) in enumerate(zip(atoms, nmax, strict=False)):

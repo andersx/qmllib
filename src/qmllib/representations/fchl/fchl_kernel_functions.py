@@ -1,3 +1,5 @@
+from typing import cast
+
 import numpy as np
 from numpy import ndarray
 from scipy.special import binom, factorial
@@ -5,7 +7,9 @@ from scipy.special import binom, factorial
 from .ffchl_module import ffchl_kernel_types as kt
 
 
-def get_gaussian_parameters(tags: dict[str, list[float]] | None) -> tuple[int, ndarray, int]:
+def get_gaussian_parameters(
+    tags: dict[str, list[list[float]]] | dict[str, list[float]] | None,
+) -> tuple[int, ndarray, int]:
 
     if tags is None:
         tags = {
@@ -24,7 +28,9 @@ def get_gaussian_parameters(tags: dict[str, list[float]] | None) -> tuple[int, n
     return kt.gaussian, parameters, n_kernels
 
 
-def get_linear_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, int]:
+def get_linear_parameters(
+    tags: dict[str, list[list[float]]] | dict[str, list[float]] | None,
+) -> tuple[int, ndarray, int]:
 
     if tags is None:
         tags = {
@@ -40,7 +46,9 @@ def get_linear_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, i
     return kt.linear, parameters, n_kernels
 
 
-def get_polynomial_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, int]:
+def get_polynomial_parameters(
+    tags: dict[str, list[list[float]]] | dict[str, list[float]] | None,
+) -> tuple[int, ndarray, int]:
 
     if tags is None:
         tags = {"alpha": [1.0], "c": [0.0], "d": [1.0]}
@@ -53,7 +61,9 @@ def get_polynomial_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarra
     return kt.polynomial, parameters, n_kernels
 
 
-def get_sigmoid_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, int]:
+def get_sigmoid_parameters(
+    tags: dict[str, list[list[float]]] | dict[str, list[float]] | None,
+) -> tuple[int, ndarray, int]:
 
     if tags is None:
         tags = {
@@ -75,7 +85,9 @@ def get_sigmoid_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, 
     return kt.sigmoid, parameters, n_kernels
 
 
-def get_multiquadratic_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, int]:
+def get_multiquadratic_parameters(
+    tags: dict[str, list[list[float]]] | dict[str, list[float]] | None,
+) -> tuple[int, ndarray, int]:
 
     if tags is None:
         tags = {
@@ -95,7 +107,7 @@ def get_multiquadratic_parameters(tags: dict[str, list[float]]) -> tuple[int, nd
 
 
 def get_inverse_multiquadratic_parameters(
-    tags: dict[str, list[float]],
+    tags: dict[str, list[list[float]]] | dict[str, list[float]] | None,
 ) -> tuple[int, ndarray, int]:
 
     if tags is None:
@@ -115,7 +127,9 @@ def get_inverse_multiquadratic_parameters(
     return kt.inv_multiquadratic, parameters, n_kernels
 
 
-def get_bessel_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, int]:
+def get_bessel_parameters(
+    tags: dict[str, list[list[float]]] | dict[str, list[float]] | None,
+) -> tuple[int, ndarray, int]:
 
     if tags is None:
         tags = {"sigma": [1.0], "v": [1.0], "n": [1.0]}
@@ -129,7 +143,9 @@ def get_bessel_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, i
     return kt.bessel, parameters, n_kernels
 
 
-def get_l2_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, int]:
+def get_l2_parameters(
+    tags: dict[str, list[list[float]]] | dict[str, list[float]] | None,
+) -> tuple[int, ndarray, int]:
 
     if tags is None:
         tags = {
@@ -150,13 +166,18 @@ def get_l2_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, int]:
     return kt.l2, parameters, n_kernels
 
 
-def get_matern_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, int]:
+def get_matern_parameters(
+    tags: dict[str, list[list[float]]] | dict[str, list[float]] | None,
+) -> tuple[int, ndarray, int]:
 
     if tags is None:
         tags = {
             "sigma": [10.0],
             "n": [2.0],
         }
+
+    # Type narrowing: this function expects list[float], not list[list[float]]
+    tags = cast(dict[str, list[float]], tags)
 
     if not len(tags["sigma"]) == len(tags["n"]):
         raise ValueError("Unexpected parameter dimensions")
@@ -180,7 +201,9 @@ def get_matern_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, i
     return kt.matern, parameters, n_kernels
 
 
-def get_cauchy_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, int]:
+def get_cauchy_parameters(
+    tags: dict[str, list[list[float]]] | dict[str, list[float]] | None,
+) -> tuple[int, ndarray, int]:
 
     if tags is None:
         tags = {
@@ -199,12 +222,17 @@ def get_cauchy_parameters(tags: dict[str, list[float]]) -> tuple[int, ndarray, i
     return kt.cauchy, parameters, n_kernels
 
 
-def get_polynomial2_parameters(tags: dict[str, list[list[float]]]) -> tuple[int, ndarray, int]:
+def get_polynomial2_parameters(
+    tags: dict[str, list[list[float]]] | dict[str, list[float]] | None,
+) -> tuple[int, ndarray, int]:
 
     if tags is None:
         tags = {
             "coeff": [[1.0, 1.0, 1.0]],
         }
+
+    # Type narrowing: this function expects list[list[float]], not list[float]
+    tags = cast(dict[str, list[list[float]]], tags)
 
     parameters = np.zeros((10, len(tags["coeff"])))
 
