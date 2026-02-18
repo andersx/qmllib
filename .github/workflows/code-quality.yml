@@ -31,10 +31,10 @@ jobs:
           pip install ruff mypy numpy scipy pytest
 
       - name: Check formatting with Ruff
-        run: ruff format --check python/ tests/
+        run: ruff format --check src/ tests/
 
       - name: Lint with Ruff
-        run: ruff check python/ tests/
+        run: ruff check src/ tests/
 
       - name: Type check with mypy
-        run: mypy python/ tests/
+        run: mypy src/ tests/

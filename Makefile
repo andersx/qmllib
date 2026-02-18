@@ -13,20 +13,28 @@ test:
 check: format typing
 
 format:
-	ruff format python/ tests/
-	ruff check --fix python/ tests/
+	ruff format src/ tests/
+	ruff check --fix src/ tests/
 
-typing:
-	mypy python/ tests/
+types:
+	mypy src/ tests/
 
-clean:
-	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	find . -type f -name "*.pyc" -delete
-	find . -type f -name "*.pyo" -delete
-	find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name ".mypy_cache" -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name ".ruff_cache" -exec rm -rf {} + 2>/dev/null || true
+clean:                             
+	find ./src/ -type f \          
+		-name "*.so" \             
+		-name "*.pyc" \            
+		-name ".pyo" \             
+		-name ".mod" \             
+		-delete                    
+	rf ./src/*.egg-info/       
+	rm -rf *.whl                   
+	rm -rf ./build/ ./__pycache__/ 
+	rm -rf ./dist/                 
+                                   
+clean-env:                         
+	rm -rf ./env/                  
+	rm ./.git/hooks/pre-commit     
+
 
 environment:
 	conda env create -f environments/environment-dev.yaml
