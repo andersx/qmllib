@@ -114,7 +114,7 @@ def generate_coulomb_matrix_atomic(
     central_decay: float | int = -1,
     interaction_cutoff: float = 1e6,
     interaction_decay: float | int = -1,
-    indices: list[int] | None = None,
+    indices: ndarray | list[int] | str | None = None,
 ) -> ndarray:
     """ Creates a Coulomb Matrix representation of the local environment of a central atom.
         For each central atom :math:`k`, a matrix :math:`M` is constructed with elements
