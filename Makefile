@@ -11,19 +11,13 @@ test:
 	pytest
 
 check: format typing
-	@echo "✅ All code quality checks passed!"
 
 format:
-	@echo "Running ruff format..."
 	ruff format python/ tests/
-	@echo "Running ruff lint with auto-fix..."
 	ruff check --fix python/ tests/
-	@echo "✅ Code formatting complete!"
 
 typing:
-	@echo "Running mypy type checking..."
 	mypy python/ tests/
-	@echo "✅ Type checking complete!"
 
 clean:
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
@@ -36,15 +30,3 @@ clean:
 
 environment:
 	conda env create -f environments/environment-dev.yaml
-
-help:
-	@echo "Available targets:"
-	@echo "  install      - Install package in editable mode with test dependencies"
-	@echo "  install-dev  - Install with dev dependencies and setup pre-commit hooks"
-	@echo "  test         - Run pytest test suite"
-	@echo "  check        - Run all code quality checks (format + typing)"
-	@echo "  format       - Format code with ruff"
-	@echo "  typing       - Run mypy type checking"
-	@echo "  clean        - Remove Python cache files and build artifacts"
-	@echo "  environment  - Create conda environment"
-	@echo "  help         - Show this help message"
