@@ -1,5 +1,5 @@
-import pytest
 import numpy as np
+import pytest
 from conftest import ASSETS, get_energies, shuffle_arrays
 
 from qmllib.kernels import laplacian_kernel

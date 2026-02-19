@@ -1,5 +1,4 @@
 import numpy as np
-import pytest
 
 from qmllib.kernels.kernels import (
     gaussian_kernel,

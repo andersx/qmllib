@@ -1,5 +1,5 @@
-import pytest
 import numpy as np
+import pytest
 from conftest import ASSETS, get_energies, shuffle_arrays
 from scipy.special import binom, factorial, jn
 
