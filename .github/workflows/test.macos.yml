@@ -1,37 +1,53 @@
-# name: Test MacOS
-# 
-# on:
-#   # push:
-#   #   branches:
-#   #     - '**'
-#   pull_request:
-#     branches: [ main ]
-# 
-# jobs:
-# 
-#   test:
-#     name: Testing ${{matrix.os}} py-${{matrix.python-version}}
-#     runs-on: ${{matrix.os}}
-# 
-#     strategy:
-#       matrix:
-#         os: ['macos-latest']
-#         python-version: ['3.11', '3.12']
-# 
-#     steps:
-#       - uses: actions/checkout@v2
-# 
-#       - name: Install the latest version of uv
-#         uses: astral-sh/setup-uv@v5
-# 
-#       - run: which brew
-#       - run: brew install gcc openblas lapack libomp
-#       - run: ls /opt/homebrew/bin/
-#       - run: which gfortran-14
-# 
-#       - run: FC=gfortran-14 make env_uv python_version=${{ matrix.python-version }}
-# 
-#       - run: make test
-#       - run: make format
-#       - run: FC=gfortran-14 make build
-#       - run: make test-dist
+name: Test MacOS
+
+on:
+  # push:
+  #   branches:
+  #     - '**'
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Testing ${{matrix.os}} py-${{matrix.python-version}}
+    runs-on: ${{matrix.os}}
+
+    strategy:
+      matrix:
+        os: ['macos-latest']
+        python-version: ['3.14']
+
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Homebrew dependencies
+        run: |
+          brew install libomp llvm gcc
+          which gfortran-14
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+
+      - name: Build & install (macOS only)
+        run: |
+          uv sync --dev --all-extras
+          # These are missed from the build-system for some reason?
+          uv pip install scikit-build-core pybind11
+          uv pip install -e .[test] --verbose
+
+      - name: Run pytest
+        run: uv run pytest tests/ -v -s
+

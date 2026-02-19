@@ -46,6 +46,9 @@ def test_cho_invert():
     A = deepcopy(A_ref)
     one = np.eye(A.shape[0])
 
+    err = np.matmul(A, Ai_qml) - one
+    print(np.max(np.abs(err)))
+
     # Check that it is a true inverse
     assert np.allclose(np.matmul(A, Ai_qml), one, atol=1e-7)
 
