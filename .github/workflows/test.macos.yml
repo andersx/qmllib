@@ -46,7 +46,7 @@ jobs:
           uv sync --dev --all-extras
           # These are missed from the build-system for some reason?
           uv pip install scikit-build-core pybind11
-          FC=/opt/homebrew/bin/gfortran-14 uv pip install -e .[test] --verbose
+          CMAKE_ARGS="-DCMAKE_Fortran_COMPILER=/opt/homebrew/bin/gfortran-14" uv pip install -e .[test] --verbose
 
       - name: Run pytest
         run: uv run pytest tests/ -v -s
