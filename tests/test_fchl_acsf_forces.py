@@ -104,7 +104,7 @@ def test_fchl_acsf_operator():
     C = np.concatenate((Kte, Kt))
 
     print("Alphas operator ...")
-    alpha = svd_solve(C, Y, rcond=1e-10)
+    alpha = svd_solve(C, Y, rcond=1e-11)
     # alpha = qrlq_solve(C, Y)
 
     eYt = np.dot(Kte, alpha)
