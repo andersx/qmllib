@@ -23,9 +23,6 @@ try:
 except ImportError:
     pytest.skip("pandas not installed", allow_module_level=True)
 
-# Mark all tests in this module as integration tests
-pytestmark = pytest.mark.integration
-
 np.set_printoptions(linewidth=999, edgeitems=10, suppress=True)
 
 
@@ -104,6 +101,7 @@ def get_reps(df):
     return x, f, e, np.array(disp_x), q
 
 
+@pytest.mark.integration
 def test_fchl_force():
 
     # Test that all kernel arguments work

@@ -7,10 +7,8 @@ from qmllib.representations import generate_coulomb_matrix_atomic
 from qmllib.solvers import cho_solve
 from qmllib.utils.xyz_format import read_xyz
 
-# Mark all tests in this module as integration tests
-pytestmark = pytest.mark.integration
 
-
+@pytest.mark.integration
 def test_krr_gaussian_local_cmat():
 
     # Parse file containing PBE0/def2-TZVP heats of formation and xyz filenames
@@ -94,6 +92,7 @@ def test_krr_gaussian_local_cmat():
     assert abs(19.0 - mae) < 1.0, "Error in local Gaussian kernel-ridge regression"
 
 
+@pytest.mark.integration
 def test_krr_laplacian_local_cmat():
 
     # Parse file containing PBE0/def2-TZVP heats of formation and xyz filenames
