@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 from conftest import ASSETS, get_energies, shuffle_arrays
 
@@ -7,6 +8,7 @@ from qmllib.solvers import cho_solve
 from qmllib.utils.xyz_format import read_xyz
 
 
+@pytest.mark.integration
 def test_krr_cmat():
 
     # Parse file containing PBE0/def2-TZVP heats of formation and xyz filenames

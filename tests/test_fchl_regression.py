@@ -23,6 +23,8 @@ try:
 except ImportError:
     pytest.skip("pandas not installed", allow_module_level=True)
 
+# Mark all tests in this module as integration tests
+pytestmark = pytest.mark.integration
 
 np.set_printoptions(linewidth=999, edgeitems=10, suppress=True)
 

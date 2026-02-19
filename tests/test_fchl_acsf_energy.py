@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 from conftest import ASSETS, get_energies, shuffle_arrays
 
@@ -9,6 +10,7 @@ from qmllib.utils.xyz_format import read_xyz
 np.set_printoptions(linewidth=666)
 
 
+@pytest.mark.integration
 def test_energy():
 
     # Read the heat-of-formation energies

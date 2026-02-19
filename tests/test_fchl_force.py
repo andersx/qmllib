@@ -10,6 +10,9 @@ import pytest
 import scipy
 import scipy.stats
 from conftest import ASSETS
+
+# Mark all tests in this module as integration tests
+pytestmark = pytest.mark.integration
 from scipy.linalg import lstsq
 
 from qmllib.kernels import get_gp_kernel, get_symmetric_gp_kernel

@@ -1,3 +1,4 @@
+import pytest
 import numpy as np
 from conftest import ASSETS, get_energies, shuffle_arrays
 from scipy.special import binom, factorial, jn
@@ -13,6 +14,9 @@ from qmllib.representations.fchl import (
 )
 from qmllib.solvers import cho_solve
 from qmllib.utils.xyz_format import read_xyz
+
+# Mark all tests in this module as integration tests
+pytestmark = pytest.mark.integration
 
 
 def _get_training_data(n_points, representation_options=None):
