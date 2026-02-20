@@ -2,7 +2,6 @@
 ./env
 *.sqlite3
 *.whl
-src/qmllib/version.py
 
 
 # Byte-compiled / optimized / DLL files
