@@ -6,6 +6,7 @@ build-backend = "scikit_build_core.build"
 name = "qmllib"
 dynamic = ["version"]
 authors = [
+    {name = "Jimmy Kromann"},
     {name = "Anders S. Christensen"},
 ]
 description = "Python/Fortran toolkit for representation of molecules and solids for machine learning of properties of molecules and solids."
