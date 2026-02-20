@@ -29,8 +29,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Required for setuptools-scm to detect version from git tags
 
       - name: Install Homebrew dependencies
         run: |
@@ -44,6 +42,7 @@ jobs:
 
       - name: Build & install (macOS only)
         env:
+          SETUPTOOLS_SCM_PRETEND_VERSION: "0.0.0"
           # Set Fortran compiler to Homebrew GCC
           FC: gfortran-14
           CMAKE_PREFIX_PATH: /opt/homebrew
@@ -55,7 +54,7 @@ jobs:
             -DOpenMP_ROOT=/opt/homebrew/opt/libomp
         run: |
           # Install build dependencies first
-          uv pip install scikit-build-core pybind11 setuptools
+          uv pip install scikit-build-core pybind11 setuptools setuptools-scm
           # Build and install with test dependencies
           uv pip install -e .[test] --verbose
 
