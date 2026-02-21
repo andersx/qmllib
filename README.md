@@ -24,6 +24,18 @@ Install from PyPI — pre-built wheels are available for Linux and macOS (no com
 pip install qmllib
 ```
 
+If you are installing from source (e.g. directly from GitHub), you will need a Fortran compiler, OpenMP and a BLAS library. On Linux:
+
+```bash
+sudo apt install gfortran libomp-dev libopenblas-dev
+```
+
+On macOS via Homebrew:
+
+```bash
+brew install gcc libomp openblas
+```
+
 Or install directly from GitHub:
 
 ```bash
