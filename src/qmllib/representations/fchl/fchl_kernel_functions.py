@@ -4,7 +4,6 @@ from typing import cast
 import numpy as np
 from numpy import ndarray
 
-
 from .ffchl_module import ffchl_kernel_types as kt
 
 
