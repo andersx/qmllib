@@ -42,7 +42,6 @@ jobs:
 
       - name: Build & install (macOS only)
         env:
-          SETUPTOOLS_SCM_PRETEND_VERSION: "0.0.0"
           # Set Fortran compiler to Homebrew GCC
           FC: gfortran-14
           CMAKE_PREFIX_PATH: /opt/homebrew

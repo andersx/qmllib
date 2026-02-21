@@ -39,8 +39,6 @@ jobs:
           enable-cache: true
 
       - name: Build & install
-        env:
-          SETUPTOOLS_SCM_PRETEND_VERSION: "0.0.0"
         run: |
           # Install build dependencies first
           uv pip install scikit-build-core pybind11 setuptools setuptools-scm

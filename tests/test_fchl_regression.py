@@ -108,7 +108,7 @@ def get_reps(df):
 @pytest.mark.integration
 def test_fchl_force():
 
-    DF_TRAIN, DF_TEST = _load_data()
+    df_train, df_test = _load_data()
 
     # Test that all kernel arguments work
     kernel_args = {
@@ -118,8 +118,8 @@ def test_fchl_force():
         },
     }
 
-    X, F, E, dX, Q = get_reps(DF_TRAIN)
-    Xs, Fs, Es, dXs, Qs = get_reps(DF_TEST)
+    X, F, E, dX, Q = get_reps(df_train)
+    Xs, Fs, Es, dXs, Qs = get_reps(df_test)
 
     F = np.concatenate(F)
     Fs = np.concatenate(Fs)

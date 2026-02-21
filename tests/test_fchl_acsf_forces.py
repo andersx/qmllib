@@ -85,11 +85,11 @@ def get_reps(df):
 
 @pytest.mark.integration
 def test_fchl_acsf_operator():
-    DF_TRAIN, DF_VALID, DF_TEST = _load_data()
+    df_train, df_valid, df_test = _load_data()
     print("Representations ...")
-    X, F, E, dX, Q = get_reps(DF_TRAIN)
-    Xs, Fs, Es, dXs, Qs = get_reps(DF_TEST)
-    Xv, Fv, Ev, dXv, Qv = get_reps(DF_VALID)
+    X, F, E, dX, Q = get_reps(df_train)
+    Xs, Fs, Es, dXs, Qs = get_reps(df_test)
+    Xv, Fv, Ev, dXv, Qv = get_reps(df_valid)
 
     F = np.concatenate(F)
     Fs = np.concatenate(Fs)
@@ -163,11 +163,11 @@ def test_fchl_acsf_operator():
 
 @pytest.mark.integration
 def test_fchl_acsf_gaussian_process():
-    DF_TRAIN, DF_VALID, DF_TEST = _load_data()
+    df_train, df_valid, df_test = _load_data()
     print("Representations ...")
-    X, F, E, dX, Q = get_reps(DF_TRAIN)
-    Xs, Fs, Es, dXs, Qs = get_reps(DF_TEST)
-    Xv, Fv, Ev, dXv, Qv = get_reps(DF_VALID)
+    X, F, E, dX, Q = get_reps(df_train)
+    Xs, Fs, Es, dXs, Qs = get_reps(df_test)
+    Xv, Fv, Ev, dXv, Qv = get_reps(df_valid)
 
     F = np.concatenate(F)
     Fs = np.concatenate(Fs)

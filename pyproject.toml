@@ -31,11 +31,10 @@ classifiers = [
 ]
 keywords = ["qml", "quantum chemistry", "machine learning", "representations", "kernels"]
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 requires-python = ">=3.10"
 dependencies = [
     "numpy>=2.0",
-    "scipy>=1.10",
 ]
 
 
