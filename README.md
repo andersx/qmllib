@@ -1,11 +1,11 @@
 # What is qmllib?
 
-[![Test Ubuntu](https://github.com/andersx/qmllib/actions/workflows/test.ubuntu.yml/badge.svg)](https://github.com/andersx/qmllib/actions/workflows/test.ubuntu.yml)
-[![Test MacOS](https://github.com/andersx/qmllib/actions/workflows/test.macos.yml/badge.svg)](https://github.com/andersx/qmllib/actions/workflows/test.macos.yml)
-[![Code Quality](https://github.com/andersx/qmllib/actions/workflows/code-quality.yml/badge.svg)](https://github.com/andersx/qmllib/actions/workflows/code-quality.yml)
-[![PyPI version](https://badge.fury.io/py/qmllib.svg)](https://pypi.org/project/qmllib/)
+[![Test Ubuntu](https://github.com/qmlcode/qmllib/actions/workflows/test.ubuntu.yml/badge.svg)](https://github.com/qmlcode/qmllib/actions/workflows/test.ubuntu.yml)
+[![Test MacOS](https://github.com/qmlcode/qmllib/actions/workflows/test.macos.yml/badge.svg)](https://github.com/qmlcode/qmllib/actions/workflows/test.macos.yml)
+[![Code Quality](https://github.com/qmlcode/qmllib/actions/workflows/code-quality.yml/badge.svg)](https://github.com/qmlcode/qmllib/actions/workflows/code-quality.yml)
+[![PyPI version](https://img.shields.io/pypi/v/qmllib)](https://pypi.org/project/qmllib/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/qmllib?logo=python&logoColor=white)](https://pypi.org/project/qmllib/)
-[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos-lightgrey)](https://github.com/andersx/qmllib)
+[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos-lightgrey)](https://github.com/qmlcode/qmllib)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 `qmllib` is a Python/Fortran toolkit for representation of molecules and solids for machine learning of properties of molecules and solids. The library is not a high-level framework where you can do `model.train()`, but supplies the building blocks to carry out efficient and accurate machine learning. As such, the goal is to provide usable and efficient implementations of concepts such as representations and kernels.
