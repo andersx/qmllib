@@ -63,11 +63,12 @@ pip install git+https://github.com/qmlcode/qmllib@feature_branch
 Fork and clone the repo, then set up the environment and run the tests:
 
 ```bash
-git clone https://github.com/qmlcode/qmllib
-cd qmllib
+git clone your_repo qmllib.git
+cd qmllib.git
 make install-dev
 make test
 ```
+Fork it, clone it, make it, test it!
 
 ## How to use
 
