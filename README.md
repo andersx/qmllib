@@ -1,13 +1,11 @@
-# What is qmllib?
-
 [![Test Ubuntu](https://github.com/qmlcode/qmllib/actions/workflows/test.ubuntu.yml/badge.svg)](https://github.com/qmlcode/qmllib/actions/workflows/test.ubuntu.yml)
 [![Test MacOS](https://github.com/qmlcode/qmllib/actions/workflows/test.macos.yml/badge.svg)](https://github.com/qmlcode/qmllib/actions/workflows/test.macos.yml)
-[![Code Quality](https://github.com/qmlcode/qmllib/actions/workflows/code-quality.yml/badge.svg)](https://github.com/qmlcode/qmllib/actions/workflows/code-quality.yml)
 [![PyPI version](https://img.shields.io/pypi/v/qmllib)](https://pypi.org/project/qmllib/)
 [![Python Versions](https://img.shields.io/pypi/pyversions/qmllib?logo=python&logoColor=white)](https://pypi.org/project/qmllib/)
 [![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos-lightgrey)](https://github.com/qmlcode/qmllib)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+## What is qmllib?
 `qmllib` is a Python/Fortran toolkit for representation of molecules and solids for machine learning of properties of molecules and solids. The library is not a high-level framework where you can do `model.train()`, but supplies the building blocks to carry out efficient and accurate machine learning. As such, the goal is to provide usable and efficient implementations of concepts such as representations and kernels.
 
 ## QML or qmllib?
@@ -20,31 +18,19 @@ If you are moving from `qml` to `qmllib`, note that there are breaking changes t
 
 ## How to install
 
-You need a fortran compiler, OpenMP and a math library. Default is `gfortran` and `openblas`.
-
-```bash
-sudo apt install gcc libomp-dev libopenblas-dev
-```
-
-If you are on mac, you can install `gcc`, OpenML and BLAS/Lapack via `brew`
-
-```bash
-brew install gcc libomp openblas lapack
-```
-
-You can then install via PyPi
+Install from PyPI — pre-built wheels are available for Linux and macOS (no compiler required):
 
 ```bash
 pip install qmllib
 ```
 
-or directly from github
+Or install directly from GitHub:
 
 ```bash
 pip install git+https://github.com/qmlcode/qmllib
 ```
 
-or if you want a specific feature branch
+Or a specific branch:
 
 ```bash
 pip install git+https://github.com/qmlcode/qmllib@feature_branch
@@ -52,22 +38,16 @@ pip install git+https://github.com/qmlcode/qmllib@feature_branch
 
 ## How to contribute
 
-Know a issue and want to get started developing? Fork it, clone it, make it, test it.
+[uv](https://docs.astral.sh/uv/) is required for the development workflow.
+
+Fork and clone the repo, then set up the environment and run the tests:
 
 ```bash
-git clone your_repo qmllib.git
-cd qmllib.git
-make # setup env
-make compile # compile
-```
-
-You know have a conda environment in `./env` and are ready to run
-
-```bash
+git clone https://github.com/qmlcode/qmllib
+cd qmllib
+make install-dev
 make test
 ```
-
-happy developing
 
 ## How to use
 
