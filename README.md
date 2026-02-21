@@ -6,6 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## What is qmllib?
+
 `qmllib` is a Python/Fortran toolkit for representation of molecules and solids for machine learning of properties of molecules and solids. The library is not a high-level framework where you can do `model.train()`, but supplies the building blocks to carry out efficient and accurate machine learning. As such, the goal is to provide usable and efficient implementations of concepts such as representations and kernels.
 
 ## QML or qmllib?
@@ -18,11 +19,18 @@ If you are moving from `qml` to `qmllib`, note that there are breaking changes t
 
 ## How to install
 
-Install from PyPI — pre-built wheels are available for Linux and macOS (no compiler required):
+Install from PyPI — pre-built wheels are available for Linux and macOS. They are pre-compiled with optimized BLAS libraries and OpenMP support.
 
+For most users, you can just install with pip:
 ```bash
 pip install qmllib
 ```
+This installs pre-compiled wheels with optimized BLAS libraries:
+- **Linux**: OpenBLAS
+- **macOS**: Apple Accelerate framework
+
+
+## Installing from source
 
 If you are installing from source (e.g. directly from GitHub), you will need a Fortran compiler, OpenMP and a BLAS library. On Linux:
 
@@ -33,7 +41,7 @@ sudo apt install gfortran libomp-dev libopenblas-dev
 On macOS via Homebrew:
 
 ```bash
-brew install gcc libomp openblas
+brew install gcc libomp llvm 
 ```
 
 Or install directly from GitHub:
@@ -71,7 +79,7 @@ Please cite the representation that you are using accordingly.
 
 - **Implementation**
 
-  Toolkit for Quantum Chemistry Machine Learning,
+  qmllib: A Python Toolkit for Quantum Chemistry Machine Learning,
   https://github.com/qmlcode/qmllib, \<version or git commit\>
 
 - **FCHL19** `generate_fchl19`
@@ -88,7 +96,7 @@ Please cite the representation that you are using accordingly.
   J. Chem. Phys. 148, 241717 (2018),
   https://doi.org/10.1063/1.5020710
 
-- **Columb Matrix** `generate_columnb_matrix_*`
+- **Coulomb Matrix** `generate_coulomb_matrix_*`
 
   Fast and Accurate Modeling of Molecular Atomization Energies with Machine Learning,
   Rupp, Tkatchenko, Müller, Lilienfeld,
